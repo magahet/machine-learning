@@ -1,4 +1,8 @@
-\documentclass{acm_proc_article-sp}
+%\documentclass{acm_proc_article-sp}
+\documentclass{sig-alternate}
+\usepackage[caption=false]{subfig}
+
+
 
 \begin{document}
 
@@ -21,14 +25,17 @@ An analysis of two machine learning classification problems, including an evalua
 
 \section{Classification Problems}
 
-Two classification datasets have been chosen based on the following criteria. First, each dataset was required to include a minimum of 3,000 sample instances to insure that sufficient data was available to evaluate each learning algorithm. A standardized test set was created by taking a uniformally random sample
-
-\section{Classification 1 - Poison Mushrooms}
-
-The first dataset we shall examine is titled, Mushroom \cite{Bache+Lichman:2013} and was chosen from the UCI ML Repository. The classification task for this dataset is to determine whether a given mushroom is edible or poisonous based on the specimen's physical attributes. There are 22 attributes which describe the physical appearance and olfactory perception of each sample. A full description of attributes can be found at http://archive.ics.uci.edu/ml/datasets/Adult.
+Two classification datasets have been chosen based on the following criteria. First, each dataset includes a minimum of 3,000 sample instances to insure sufficient data to evaluate each learning algorithm. Test sets were created by taking a uniform random sample of 33\% of the original instances without replacement. The remaining 66\% were then used as a training superset. Smaller subsets were pulled from this partition as needed.
 
 
-\section{Classification 2 - xxxx}
+\subsection{Classification Task 1 - Poison Mushrooms}
+
+The first dataset is titled, Mushroom \cite{Bache+Lichman:2013} and was chosen from the UCI ML Repository. The classification task for this dataset is to determine whether a given mushroom is edible or poisonous based on the specimen's physical attributes. There are 22 recorded attributes which describe the physical appearance and olfactory perception of each sample. A full description of attributes can be found at http://archive.ics.uci.edu/ml/datasets/Mushroom
+
+This classification task allows for the  various learning algorithms' behavior on attributes with only discrete values. The attributes are based on direct physical observations, which makes the data easier to comprehend without domain knowledge.
+
+
+\subsection{Classification Task 2 - Income}
 
 Our second dataset was also chosen from the UCI ML Repository and is titled, Adult \cite{Bache+Lichman:2013}. The classification task in this case is to determine if one's household income exeeds \$50,000/yr based on 14 biographical attributes. The data was collected from a census database from 1994. Attributes include the subject's age, level of education, marital-status, occupation, race, sex, etc. The full description of attributes can be found at http://archive.ics.uci.edu/ml/datasets/Adult.
 
@@ -39,17 +46,32 @@ Our second dataset was also chosen from the UCI ML Repository and is titled, Adu
 
 \subsection{Learning Curve}
 
-\begin{figure}[te-c45]
+\begin{figure}[test-error]
 \centering
-\includegraphics[width=3in]{data/agaricus-lepiota/learning-curve-10to2000/test-error-c45.pdf}
-\caption{Test Error by Training Size - C4.5}
-\end{figure} 
 
-\begin{figure}[te-perceptron]
-\centering
-\includegraphics[width=3in]{data/agaricus-lepiota/learning-curve-10to2000/test-error-perceptron.pdf}
-\caption{Test Error by Training Size - ANN}
-\end{figure} 
+\subfloat[Test Error by Training Size - C4.5]{%
+  \includegraphics[width=0.3\textwidth]{data/agaricus-lepiota/learning-curve-10to2000/test-error-c45.pdf}
+  \label{fig:c45}
+}
+
+\subfloat[Test Error by Training Size - ANN]{%
+  \includegraphics[width=0.3\textwidth]{data/agaricus-lepiota/learning-curve-10to2000/test-error-perceptron.pdf}
+  \label{fig:perceptron}
+}
+
+\end{figure}
+
+%\begin{figure}[te-c45]
+%\centering
+%\includegraphics[width=3in]{data/agaricus-lepiota/learning-curve-10to2000/test-error-c45.pdf}
+%\caption{Test Error by Training Size - C4.5}
+%\end{figure} 
+
+%\begin{figure}[te-perceptron]
+%\centering
+%\includegraphics[width=3in]{data/agaricus-lepiota/learning-curve-10to2000/test-error-perceptron.pdf}
+%\caption{Test Error by Training Size - ANN}
+%\end{figure} 
 
 %\begin{figure}[]
 %\centering
