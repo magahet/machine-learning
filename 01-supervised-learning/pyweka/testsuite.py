@@ -14,11 +14,17 @@ logger.addHandler(logging.NullHandler())
 
 
 class TestSuite(object):
-    def __init__(self, datafile):
+    def __init__(self, data_file=None, results_file=None):
         self.classifiers = Classifiers()
-        self.data = DataSet(datafile)
-        self.data.save_test_file()
-        self.results = []
+        if data_file:
+            self.data = DataSet(data_file)
+            self.data.save_test_file()
+        else:
+            self.data = None
+        if results_file:
+            self.load_results(results_file)
+        else:
+            self.results = []
 
     @staticmethod
     def parse_tree_output(raw_output):

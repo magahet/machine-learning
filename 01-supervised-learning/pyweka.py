@@ -4,6 +4,7 @@ import argparse
 import logging
 import pyweka
 import os
+import glob
 
 
 def run_multiple_samples_and_classifiers(_dir='.'):
@@ -38,9 +39,17 @@ def run_multiple_samples_and_classifiers(_dir='.'):
         f.savefig('{}/learning-curve-10to2000/runtime-{}.pdf'.format(_dir, name))
 
 
+def load_multiple_results(pattern):
+    results_list = []
+    for path in glob.glob(pattern):
+        t = pyweka.TestSuite(results_file=path)
+        results_list.append(t.results)
+    return results_list
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='weka wrapper')
-    parser.add_argument('datafile', help='file to sample')
+    parser.add_argument('--datafile', '-d', help='file to sample')
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger()
