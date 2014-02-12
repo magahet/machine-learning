@@ -32,14 +32,24 @@ class TestSuite(object):
             'Number of Leaves  : \t{leaf_count:^g}',
             'Size of the tree : \t{tree_size:^g}',
             'Time taken to build model: {run_time:^g} seconds',
-            'Error on training data ===\n\nCorrectly Classified Instances {training_matches:^g} {training_accuracy:^g} %\nIncorrectly Classified Instances {training_misses:^g} {training_error:^g} %',
-            'Error on test data ===\n\nCorrectly Classified Instances {testing_matches:^g} {testing_accuracy:^g} %\nIncorrectly Classified Instances {testing_misses:^g} {testing_error:^g} %',
         ]
+        train_test_patterns = [
+            'Correctly Classified Instances {matches:^g} {accuracy:^g} %\nIncorrectly Classified Instances {misses:^g} {error:^g} %',
+            'Weighted Avg. {tp_rate:^g} {fp_rate:^g} {percision:^g} {recall:^g} {f_measure:^g} {roc_area:^g}',
+        ]
+
         result = {}
         for pattern in pattern_list:
             match = parse.search(pattern, raw_output)
             if match is not None:
                 result.update(match.named)
+        for pattern in train_test_patterns:
+            matches = [m for m in parse.findall(pattern, raw_output)]
+            if len(matches) == 2:
+                for k, v in matches[0].named.iteritems():
+                    result['training_{}'.format(k)] = v
+                for k, v in matches[1].named.iteritems():
+                    result['testing_{}'.format(k)] = v
         return result
 
     def run_test(self, classifier, sample_size=None, options=''):
@@ -47,13 +57,14 @@ class TestSuite(object):
                     classifier, sample_size, len(self.data.training_data))
         size = len(self.data.training_data) if sample_size is None else sample_size
         self.data.save_training_file(size)
-        cmd = "java -cp /usr/share/java/weka.jar {} {} -t /tmp/train.arff -T /tmp/test.arff"
+        cmd = "java -cp /usr/share/java/weka.jar {} {} -i -t /tmp/train.arff -T /tmp/test.arff"
         logger.info(cmd.format(classifier, options))
         output = subprocess.check_output(cmd.format(classifier, options), shell=True)
         parsed_output = self.parse_tree_output(output)
         logger.info('results: %s', str(parsed_output))
         return {
             'sample_size': size,
+            'options': options,
             'classifier': classifier,
             'raw_output': output,
             'results': parsed_output
@@ -80,10 +91,19 @@ class TestSuite(object):
             fig.show()
         return fig, axes
 
-    def run_multiple_sample_sizes(self, classifier, sample_sizes, options=''):
+    def run_multiple_tests(self, classifier, sample_size=None, options=None):
         self.results = []
-        for size in sample_sizes:
-            self.results.append(self.run_test(classifier, size, options=options))
+        sample_size = len(self.data.training_data) if sample_size is None else sample_size
+        options = '' if options is None else options
+        sample_size_list = sample_size if isinstance(sample_size, list) else [sample_size]
+        options_list = options if isinstance(options, list) else [options]
+        try:
+            for options in options_list:
+                for size in sample_size_list:
+                    self.results.append(self.run_test(classifier, size, options=options))
+        except KeyboardInterrupt:
+            print 'exiting'
+            return
 
     def run_multiple_classifiers(self, classifier_list, sample_size=None):
         self.results = []
