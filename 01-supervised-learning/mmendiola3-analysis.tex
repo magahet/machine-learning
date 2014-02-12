@@ -22,7 +22,7 @@ Magahet Mendiola
 
 \maketitle
 \begin{abstract}
-An analysis of two machine learning classification problems, including an evaluation of various learning algorithms and an exploration into the 
+An analysis of two machine learning classification problems, including an evaluation of various learning algorithms performance and behavior on the datasets.
 \end{abstract}
  
 
@@ -199,13 +199,13 @@ It is also interesting to note that the attributes identified by the decision tr
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=2in]{data/agaricus-lepiota/perceptron/training-iterations.pdf}
+    \includegraphics[width=3in]{data/agaricus-lepiota/perceptron/training-iterations.pdf}
     \caption{mushroom - neural network error by training iterations \label{ag-nn-ti}}
 \end{figure} 
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=2in]{data/agaricus-lepiota/perceptron/learning-rate.pdf}
+    \includegraphics[width=3in]{data/agaricus-lepiota/perceptron/learning-rate.pdf}
     \caption{mushroom - neural network error by learning rate \label{ag-nn-lr}}
 \end{figure} 
 
@@ -242,15 +242,48 @@ Attrib gill-spacing=w    0.8125552864255976
 \subsection{Boosting}
 %Implement a boosted version of your decision trees. As before, you will want to use some form of pruning, but presumably because you're using boosting you can afford to be much more aggressive about your pruning.
 
-As noted earlier, the boosting algorithm continued to oscillate between high and low classification errors as the training set size increased. A follow up test was performed to see if differing boosting iterations would have an effect on the overall error. 
+As noted earlier, the boosting algorithm continued to oscillate between high and low classification errors as the training set size increased. A follow up test was performed to see if differing boosting iterations would have an effect on the overall error. The results are shown in Figure~\ref{ag-boost-iter}. This plot shows that after around 50 training iterations, boosting began producing models with higher classification error on the test set. This indicates that overfitting begins to occur and the model is no longer able to generalize well.
 
-An examination of the boosting behavior shows that, as expected, the odor attribute was chosen by the weak learner (decision stump), for many of the boosting iterations. Each time instances which caused 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/boosting/training-iterations.pdf}
+    \caption{Mushroom - error by boosting iterations \label{ag-boost-iter}}
+\end{figure} 
+
+An examination of the boosting behavior shows that, as expected, the odor attribute was chosen by the weak learner (decision stump), for many of the boosting iterations. Each time the instance weight distribution caused the learner to select a different attribute, the next iteration odor was again the attribute chosen.
+
 
 \subsection{Support Vector Machines}
 %You should implement (for sufficently loose definitions of implement including download) SVMs. This should be done in such a way that you can swap out kernel functions. I'd like to see at least two.
 
+The SVM performance in the initial experiment performed well in regards to quickly converging to low classification error with just over 500 samples. This learner also performed quite consistently at the low test error rate as more training data was added. The SVM training times were the second highest, being consistently double to triple that of the other eager learners. It was still significantly faster than the neural network. Even after dropping the 63 nodes in the hidden layer, the neural network was still significantly slower than SVM at the same training set size.
+
+Follow up experiments were performed to see how changes to the SVM kernel would affect it's performance. It can be seen from Figure~\ref{ag-svm-poly} that using a polynomial kernel function with degree 6 produced the smallest classification error (2\%), which is significantly lower than that achieved by the linear kernel (7\%).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/svm/polynomial.pdf}
+    \caption{Mushroom - error by svm polynomial kernel exponent \label{ag-svm-poly}}
+\end{figure} 
+
+The SVM kernel was then changed to a radial basis kernel to evaluate it's behavior. Figure~\ref{ag-svm-rbf} shows that the smallest classification error (2\%) was reached with a gamma of 0.225. This is the same error as that found using the degree 6 polynomial kernel. However, the RBF kernel took twice as long to train (0.8 sec vs. 0.4).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/svm/rbf.pdf}
+    \caption{Mushroom - error by svm rbf gamma\label{ag-svm-rbf}}
+\end{figure} 
+
 \subsection{k-nearest neighbor}
 %You should implement kNN. Use different values of k.
+
+Initial performance results, with a single nearest neighbor, show a classification error of 3\%. Figure~\ref{ag-knn-k} shows the results of experimenting with various values for k. The plot indicates that k=3 lowered the error on a 1,000 instance training set to 2.5\%. 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/k-nn/k.pdf}
+    \caption{Mushroom - error by number of k-nn neighbors\label{ag-knn-k}}
+\end{figure} 
 
 
 

@@ -20,23 +20,28 @@ def run_multiple_samples_and_classifiers(_dir='.'):
     if not os.path.exists('{}'.format(_dir)):
         os.makedirs('{}'.format(_dir))
 
-    sizes = range(10, 2001, 10)
-
-    group_dir = '{}/learning-curve-10to2000'.format(_dir)
+    group_dir = '{}/k-nn'.format(_dir)
     if not os.path.exists(group_dir):
         os.makedirs(group_dir)
     profiles = {
-        'c4.5': (c.j48, sizes, ''),
-        'boosting-stump': (c.boost_stump, sizes,  ''),
-        'perceptron': (c.perceptron, sizes,  ''),
-        'svm-polykernel': (c.svm, sizes,  ''),
-        'k-nn-1': (c.ibk, sizes,  '-K 1'),
-        #'k-nn-3': (c.ibk, sizes,  '-K 3'),
-        #'k-nn-5': (c.ibk, sizes,  '-K 5'),
+        #'c4.5': (c.j48, range(10, 2001, 10), ''),
+        #'boosting-stump': (c.boost_stump, range(10, 2001, 10),  ''),
+        #'perceptron': (c.perceptron, range(10, 2001, 10),  ''),
+        #'svm-polykernel': (c.svm, range(10, 2001, 10),  ''),
+        #'k-nn-1': (c.ibk, range(10, 2001, 10),  '-K 1'),
+        #'k-nn-3': (c.ibk, range(10, 2001, 10),  '-K 3'),
+        #'k-nn-5': (c.ibk, range(10, 2001, 10),  '-K 5'),
 
         #'learning-rate': (c.perceptron, 1000,  ['-L {}'.format(n) for n in drange(0.1, 10, 0.1)]),
         #'momentum': (c.perceptron, 1000,  ['-M {}'.format(n) for n in drange(0.1, 10, 0.1)]),
         #'iterations': (c.perceptron, 1000,  ['-N {}'.format(n) for n in range(10, 2001, 10)]),
+
+        #'boosting-stump': (c.boost_stump, [1000],  ['-I {}'.format(n) for n in range(1, 1001, 1)]),
+
+        #'svm-polykernel': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.PolyKernel -E {}"'.format(n) for n in range(1, 11)]),
+        #'svm-rbf': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.RBFKernel -G {}"'.format(n) for n in drange(0.001, 0.4, 0.001)]),
+
+        'k-nn': (c.ibk, 1000,  ['-K {}'.format(n) for n in range(1, 101)]),
     }
 
     results_list = []
@@ -48,6 +53,7 @@ def run_multiple_samples_and_classifiers(_dir='.'):
             t.run_multiple_tests(*p)
             t.save_results('{}/{}.pkl'.format(group_dir, name))
         results_list.append(t.results)
+    return results_list
     #f, a = t.plot_result('sample_size', 'training_error', '{} training error by training size'.format(name))
         #f.savefig('{}/train-error-{}.pdf'.format(group_dir, name))
         #f, a = t.plot_result('sample_size', 'testing_error', '{} testing error by training size'.format(name))
