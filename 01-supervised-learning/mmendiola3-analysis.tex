@@ -42,11 +42,11 @@ This dataset allows for experimentation of various learning algorithms against a
 
 \subsection{Attribute characteristics}
 
-By examining the value distributions as seen in Figure~\ref{ag-data-viz}, we first observe that the two classifications are fairly evenly distributed (48\% edible, 52\% poisonous). This allows for the evaluation of learning algorithm accuracy based on the percentage of classification mistakes made by the model on our test set. This metric will not be unduly weighted by a greater occurrence of one of the classes. It is worth considering the use case for such a classification task though. For example, if this model were to be used to decide whether to serve a given mushroom to a class full of students, we would prefer a hypothesis that favored misclassification of edible over that of poisonous. This idea will be examined while exploring the test results.
+By examining the value distributions as seen in Figure~\ref{ag-data-viz}, we first observe that the two classifications are fairly evenly distributed (48\% edible, 52\% poisonous). This allows for the evaluation of learning algorithm accuracy based on the percentage of classification mistakes made by the model on our test set. This metric will not be unduly weighted by a greater occurrence of one of the classes. It is worth considering the use case for such a classification task though. For example, if this model were to be used to decide whether to serve a given mushroom to a class full of students, we would prefer a hypothesis that favored misclassification of edible over that of poisonous. To be more precise, we would be most concerned with the recall of the poison class, to insure we identify a high percentage of those mushrooms that are in fact poisonous. For the purpose of this first classification task, we will focus on the simple metric of classification error.
 
 Each attribute includes a finite and limited set of values (min: 2, max:12). This indicates that information gain would provide a suitable metric for decision tree attribute selection, as the variance in value ranges is not significant and, similar to our reasoning for class distribution, we will not need to account for attributes with greater than average ranges of values.
 
-With all the attributes taking discrete (nominal) values, we will be somewhat constrained in learning algorithms options. For example, neural network network input nodes will need to be setup for each attribute value pair; separating them into binary attributes for each value. Similarly, nominal attributes will limit the capabilities of SVM. Non-linear kernels will not be effective in increasing the, already linearity separable, feature space. The behavior of k-nn will also be constrained as well. Distance metrics for such attributes will either be simplistic (testing for exact matches) or less intuitive than measuring euclidean distance.
+With all the attributes taking discrete (nominal) values, learning algorithm options will be somewhat constrained. For example, neural network network input nodes will need to be setup for each attribute value pair; separating them into binary attributes for each value. The behavior of k-nn will also be constrained. Distance metrics for such attributes will either be simplistic (testing for exact matches) or less intuitive than measuring euclidean distance.
 
 \begin{figure}[!htbp]
     \centering
@@ -54,7 +54,7 @@ With all the attributes taking discrete (nominal) values, we will be somewhat co
     \caption{mushroom attribute distribution and classification \label{ag-data-viz}}
 \end{figure} 
 
-It can also be observed visually that a number of attributes provide clear separability between the target classes. This supports the intuition that this set of attributes does have some functional relationship to the classes. In fact it appears, from the figure, that the attribute ``odor'' by itself could provide a fairly clear indicator of how a sample should be classified. ``Spore-print-color'' appears to provide decent class separation as well. It can be predicted that these attributes will be heavily weighted during the attribute selection or weighting process.
+We can observe, visually, that a number of attributes provide clear separability between the target classes. This supports the intuition that our attributes do have some functional relationship to the classes. In fact, it appears from the figure that the attribute odor, by itself, could provide a fairly clear indicator of how a sample should be classified. Spore-print-color appears to provide decent class separation as well. We can predict that these attributes will be heavily weighted during the attribute selection or weighting process.
 
 \subsection{Algorithm Evaluations}
 %the training and testing error rates you obtained running the various learning algorithms on your problems. At the very least you should include graphs that show performance on both training and test data as a function of training size (note that this implies that you need to design a classification problem that has more than a trivial amount of data) and--for the algorithms that are iterative--training times.
@@ -101,18 +101,12 @@ The elapsed time required for each learner to consume the training set has been 
 \end{figure} 
 
 
-\subsubsection{Decision Trees}
+\subsection{Decision Trees}
 %Decision Trees. For the decision tree, you should implement or steal a decision tree algorithm. Be sure to use some form of pruning. You are not required to use information gain (for example, there is something called the GINI index that is sometimes used) to split attributes, but you should describe whatever it is that you do use.
 
 Further experimentation into the decision tree learner was performed on subsets of the original data. As before, 1/3 of the data was partitioned for testing. The training set was then taken as 1,000 instances from the remaining set.
 
 As a baseline, the learner was run with initial settings, which included post-pruning with a 0.25 confidence factor and a minimum leaf size of 2 instances. These settings produced the tree in Figure~\ref{dt-c025}. This tree produced no training classification error and 12\% error on the test set. The majority of training instances were classified based on two attributes, odor and stalk-shape.
-
-The discrepancy in training and testing error indicates that the learner may be overfitting the training data. This is further supported by the small number of instances categorized by deeper leaves. To try to archive better generalize, the same process was repeated with more aggressive post-pruning parameters. The results of setting the confidence factor to 0.01 is shown in Figure~\ref{dt-c001}.
-
-Although a negligible number of instances were miscategorized from the training set, the classification error on the test set dropped to 4\%. The resulting tree is made up of a single attribute node with nine leaves. This confirms the initial hypothesis that overfitting was occurring with the initial parameters. It can also be seen that, as expected, the odor attribute does in fact exert a great deal of influence on correct classification. To validate this further, Weka's attribute evaluator tool was used to calculate the information gain for this attribute, which came out at 0.83. This confirms further the strength of this attribute in classification.
-
-It should be noted that Adjusting the post-pruning parameters further would have no effect on the tree, as it cannot be pruned further. When run with no post-pruning performed, the same tree is produced as with the initial settings.
 
 \begin{verbbox}
 
@@ -154,6 +148,8 @@ Size of the tree :  25
 \end{figure}
 
 
+The discrepancy in training and testing error indicates that the learner may be overfitting the training data. This is further supported by the small number of instances categorized by deeper leaves. To try to archive better generalize, the same process was repeated with more aggressive post-pruning parameters. The results of setting the confidence factor to 0.01 is shown in Figure~\ref{dt-c001}.
+
 \begin{verbbox}
 
 odor = a: e (69.0)
@@ -177,6 +173,12 @@ Size of the tree :  10
     \theverbbox
     \caption{c4.5 decision tree with 0.01 confidence interval \label{dt-c001}}
 \end{figure}
+
+Although a negligible number of instances were miscategorized from the training set, the classification error on the test set dropped to 4\%. The resulting tree is made up of a single attribute node with nine leaves. This confirms the initial hypothesis that overfitting was occurring with the initial parameters. We can also see that, as expected, the odor attribute does in fact exert a great deal of influence on correct classification. To validate this further, Weka's attribute evaluator tool was used to calculate the information gain for this attribute, which came out at 0.83. This confirms further the strength of this attribute in classification.
+
+We should note that Adjusting the post-pruning parameters further would have no effect on the tree, as there is only a single node left and cannot be pruned further. When run with no post-pruning performed, the same tree is produced as with the initial settings.
+
+
 
 \subsection{Neural networks}
 %For the neural network you should implement or steal your favorite kind of network and training algorithm. You may use networks of nodes with as many layers as you like and any activation function you see fit.
@@ -292,7 +294,9 @@ Initial performance results, with a single nearest neighbor, show a classificati
 
 \section{Classification - Income}
 
-Our second dataset was also chosen from the UCI ML Repository and is titled, Adult \cite{Bache+Lichman:2013}. The classification task in this case is to determine if one's household income exeeds \$50,000/yr based on 14 biographical attributes. The data was collected from a census database from 1994. Attributes include the subject's age, level of education, marital-status, occupation, race, sex, etc. The full description of attributes can be found at http://archive.ics.uci.edu/ml/datasets/Adult.
+Our second dataset was also chosen from the UCI ML Repository and is titled, Adult \cite{Bache+Lichman:2013}. The classification task in this case is to determine if one's household income exceeds \$50,000/yr based on 14 biographical attributes. The data was collected from a census database from 1994. Attributes include the subject's age, level of education, marital-status, occupation, race, sex, etc. The full description of attributes can be found at http://archive.ics.uci.edu/ml/datasets/Adult.
+
+Unlike the first classification task, this dataset is made up of both nominal and numerical attributes. This will encourage comparisons between each learner's behavior with the differing profile of attribute types.
 
 \subsection{Attribute characteristics}
 
@@ -300,7 +304,7 @@ Value distributions for the income dataset are shown in Figure~\ref{ad-data-viz}
 
 Another difference with this dataset is that the two classifications are not as evenly distributed (76\% under 50k, 24\% over 50k). This will have implications when analyzing the performance of the various learners. The chosen metric will need to conform the use cases for the resulting model. For example, if the end user is most interested in correctly identifying all individuals with incomes greater than 50k, the performance metric should be the recall for that class. As can be seen in the example accuracy results from Figure~\ref{ad-metrics}, the classifier did well at positively identifying people making under 50k (0.95 true positive rate). However, it was only able to correctly identify 55\% of those making over 50k.
 
-For the purposes of evaluating the current set of learners, the weighted average f-score (f-measure in Weka) was used. This provided a measure of both precision and recall metrics across both classifications. This will test each learner's ability to achieve a balanced confusion matrix.
+For the purposes of evaluating the current set of learners, the weighted average f-score (f-measure in Weka) was used. This provides a measure of both precision and recall metrics across both classifications. Thus testing each learner's ability to achieve a balanced confusion matrix.
 
 
 \begin{figure}[!htbp]
@@ -335,7 +339,11 @@ Weighted Avg.    0.858     0.355      0.851     0.858     0.849      0.865
 \end{figure}
 
 
+\subsection{Algorithm Evaluations}
+
 \subsubsection{Learning Curves}
+
+As before, the same starting parameters were chosen for each learner. Then training was performed against a range of training set sizes (10 to 2,000 by 10). The difference in this task is that instead of using classification error as our performance metric, we will be using the weighted f-score. Figure~\ref{ad-error} shows the results of this initial experiment (blue=testing set, red=training set).
 
 \begin{figure}[!htbp]
     \centering
@@ -343,13 +351,246 @@ Weighted Avg.    0.858     0.355      0.851     0.858     0.849      0.865
     \caption{Income - F-Score by Training Size \label{ad-error}}
 \end{figure} 
 
+It is interesting to observe how the f-score on the testing set begins low and raises as training instances are added, while the opposite behavior occurs with the training set f-score. This is expected behavior, as it is easier to find a hypothesis that fits a small set of training data, but does not generalize well to the test set. Conversely, it becomes more difficult to fit a larger training set and the learner is forced to find a hypothesis that generalizes better. The learner could overfit the data, in which case the training error would remain low and the testing error would eventually begin raising again. This behavior was not exhibited in the initial experiment. 
+
+
 \subsubsection{Training Times}
+
+Each learner, with naive parameters, seems to perform similarly across the training set sizes, with k-NN acheving slightly lower f-scores. However, there is a significant difference in the training times as seen in Figure~\ref{ad-runtime}. As seen in the previous classification experiment, the neural network took significantly longer to train for each training set size. In this case the difference was nearly three orders of magnitude greater than the other eager learners.
+
+Again, k-NN did take some time to process the training set, which is believed to be attributed to sorting the instances for faster distance calculations.
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{data/adult/learning-curve-10to2000/runtime.pdf}
     \caption{Income - Training Time by Training Size \label{ad-runtime}}
 \end{figure} 
+
+
+\subsection{Decision Trees}
+%Decision Trees. For the decision tree, you should implement or steal a decision tree algorithm. Be sure to use some form of pruning. You are not required to use information gain (for example, there is something called the GINI index that is sometimes used) to split attributes, but you should describe whatever it is that you do use.
+
+The fact that this dataset is made up of both continuous and discrete attributes means that we must address the issue of how to split numerical attributes at decision nodes. The C4.5 algorithm, which is used in this case, is natively able to handle continuous attributes by finding a value threshold that maximizes the information gain ratio on the resulting two sets of instances.
+
+The results of running the C4.5 decision tree algorithm on a 1,000 instance training set and a 0.25 confidence factor for post-pruning resulted in the tree shown in Figure~\ref{ad-dt-c025}. We can observe a few interesting results from this tree. First, the capital-gain attribute was chosen as the first node despite the fact that it's information gain at the first node is quite small compared to other attributes (0.08978 vs. 0.18 for relationship). This discrepancy is accounted for by examining the instances directly. We see that capital-gain has a value of 0 for most of the instances. In contrast, other attributes take on a wide range of values and thus have an unfair advantage in the information gain calculation. To compensate for this, C4.5 uses the normalized information gain ratio, which is specifically designed to account for these cases of imbalanced value distribution. Using this metric, we see that capital-gain does rank highest among the attributes (0.3 vs. 0.085 for relationship).
+
+\begin{verbbox}
+
+
+J48 pruned tree
+------------------
+
+capital-gain <= 5013
+|   education-num <= 11
+|   |   age <= 28:  <=50K (221.0/1.0)
+|   |   age > 28
+|   |   |   capital-loss <= 625:  <=50K (442.0/70.0)
+|   |   |   capital-loss > 625
+|   |   |   |   capital-loss <= 1651:  <=50K (7.0/1.0)
+|   |   |   |   capital-loss > 1651:  >50K (12.0/3.0)
+|   education-num > 11
+|   |   marital-status =  Never-married:  <=50K (76.0/9.0)
+|   |   marital-status =  Married-civ-spouse:  >50K (147.0/41.0)
+|   |   marital-status =  Divorced
+|   |   |   hours-per-week <= 44:  <=50K (22.0)
+|   |   |   hours-per-week > 44
+|   |   |   |   fnlwgt <= 112497:  >50K (4.0)
+|   |   |   |   fnlwgt > 112497:  <=50K (8.0/1.0)
+|   |   marital-status =  Married-spouse-absent:  <=50K (7.0/1.0)
+|   |   marital-status =  Separated:  <=50K (2.0/1.0)
+|   |   marital-status =  Married-AF-spouse:  <=50K (0.0)
+|   |   marital-status =  Widowed:  <=50K (2.0)
+capital-gain > 5013:  >50K (50.0/2.0)
+
+Number of Leaves  :     14
+
+Size of the tree :  22
+
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{c4.5 decision tree with 0.25 confidence interval \label{ad-dt-c025}}
+\end{figure}
+
+
+In order to determine if the resulting tree is overfitting the data, experiments were run with varying degrees of post-pruning, including disabling pruning altogether. The results in Figure~\ref{ad-dt-pr} show us that our weighted f-score does not vary significantly with larger or smaller trees. We do see from Figures~\ref{ad-dt-sm}~and~\ref{ad-dt-lg} that recall for the greater than 50k class is better with the larger tree (0.623 vs. 0.545). It turns out that most of the under 50k classified instances are identified near the top of the tree. Adding additional nodes helps to identify more over 50k instances, but does not impact the tree's ability to classify the under 50k class.
+
+
+
+\begin{figure}[!htbp]
+    \centering
+    \small
+    \begin{tabular}{ | l | l | l | l | }
+        \hline
+        Pruned & Confidence Factor & Weighted F-Score & Tree Size\\ \hline
+        no & n/a & 0.837 & 136\\ \hline
+        yes & 0.25 & 0.836 & 22\\ \hline
+        yes & 0.1 & 0.833 & 16\\ \hline
+        yes & 0.01 & 0.834 & 12\\ \hline
+    \end{tabular}
+    \normalsize
+    \caption{decision tree results with various levels of pruning \label{ad-dt-pr}}
+\end{figure}
+
+
+\tiny
+\begin{verbbox}
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 0.939     0.455      0.864     0.939     0.9        0.758     <=50K
+                 0.545     0.061      0.742     0.545     0.629      0.758     >50K
+Weighted Avg.    0.842     0.359      0.835     0.842     0.834      0.758
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 7851  513 |    a =  <=50K
+ 1231 1476 |    b =  >50K
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{performance metrics - C4.5 - 12 node tree\label{ad-dt-sm}}
+\end{figure}
+
+\tiny
+\begin{verbbox}
+=== Detailed Accuracy By Class ===
+
+               TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+                 0.91      0.377      0.882     0.91      0.896      0.857     <=50K
+                 0.623     0.09       0.693     0.623     0.656      0.857     >50K
+Weighted Avg.    0.84      0.307      0.836     0.84      0.837      0.857
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 7615  749 |    a =  <=50K
+ 1020 1687 |    b =  >50K
+
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{performance metrics - C4.5 - 136 node tree\label{ad-dt-lg}}
+\end{figure}
+
+
+
+\subsection{Neural networks}
+%For the neural network you should implement or steal your favorite kind of network and training algorithm. You may use networks of nodes with as many layers as you like and any activation function you see fit.
+
+The neural network learner was again evaluated with a number of varying parameters. Our network in this case was smaller with initial settings than in the first classification task. Again a single hidden layers was created with the number of nodes totaling 1/2 the number of attributes and classifications. These settings resulted in an f-score of 0.8. Using the same training set, a network was then created with no hidden layer. The resulting f-score was 0.818. Recall and precision for each class were not greatly impacted by the inclusion or removal of the hidden layer either. To be thorough, the same experiment was performed with four nodes in a hidden layer. This produced nearly identical results to the network with no hidden layer.
+
+As before, different learning rates and training iterations were evaluated. The results are displayed in Figures~\ref{ad-nn-ti}~and~\ref{ad-nn-lr}.
+
+The results from varying the learning rate and training iterations  is displayed in Figures~\ref{ag-nn-ti}~and~\ref{ag-nn-lr}. These plots show variance in the classification error for training iterations and learning rate. However, there is no discernible trend that would indicate better performance of the learner with a specific parameter value.
+
+From examination of the attribute value distribution, and interpreting the results from the decision tree algorithm, it can be hypothesized that very few attributes have an influence on classification. Furthermore, there seems to be a direct relationship between those attributes and the class. This leads to the intuition that hidden layers in our neural network may be superfluous. It turns out, through repeating the experiment with decreasing numbers of hidden nodes, that classification error does not increase considerably. When a network with no hidden layer is trained, the error actually dropped from 7.7\% to 7.6\%. The significant advantage to this simplified network is the training time difference. The new network, with 63 fewer nodes, was able to train on the dataset in 1\% of the original time.
+
+It is also interesting to note that the attributes identified by the decision tree algorithm as being the most relevant show the highest weights on the output nodes. This can be seen in the subset of weight outputs in Figure~\ref{ag-nn-weights}.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/perceptron/training-iterations.pdf}
+    \caption{mushroom - neural network error by training iterations \label{ag-nn-ti}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/perceptron/learning-rate.pdf}
+    \caption{mushroom - neural network error by learning rate \label{ag-nn-lr}}
+\end{figure} 
+
+\begin{verbbox}
+Attrib cap-color=u    0.32909165328321105
+Attrib cap-color=e    0.27084200618784854
+Attrib cap-color=w    -0.6781600170313064
+Attrib cap-color=y    -0.0944215007903694
+Attrib bruises?    -0.20164966240021834
+Attrib odor=a    1.9591467769018915
+Attrib odor=l    2.163249089101404
+Attrib odor=c    -1.938000290279853
+Attrib odor=y    -0.7210176961657636
+Attrib odor=f    -1.4655475615783258
+Attrib odor=m    -0.0022502391144373773
+Attrib odor=n    2.249162579023187
+Attrib odor=p    -2.08204828811813
+Attrib odor=s    -0.2329200532370795
+Attrib gill-attachment=a    -0.016241324327899875
+Attrib gill-attachment=d    0.0167616393841718
+Attrib gill-attachment=f    0.04167201385764717
+Attrib gill-attachment=n    -0.023866806192559844
+Attrib gill-spacing=c    -0.8456690489234284
+Attrib gill-spacing=w    0.8125552864255976
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{neural network sample output node weights \label{ag-nn-weights}}
+\end{figure}
+
+
+\subsection{Boosting}
+%Implement a boosted version of your decision trees. As before, you will want to use some form of pruning, but presumably because you're using boosting you can afford to be much more aggressive about your pruning.
+
+As noted earlier, the boosting algorithm continued to oscillate between high and low classification errors as the training set size increased. A follow up test was performed to see if differing boosting iterations would have an effect on the overall error. The results are shown in Figure~\ref{ag-boost-iter}. This plot shows that after around 50 training iterations, boosting began producing models with higher classification error on the test set. This indicates that overfitting begins to occur and the model is no longer able to generalize well.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/boosting/training-iterations.pdf}
+    \caption{Mushroom - error by boosting iterations \label{ag-boost-iter}}
+\end{figure} 
+
+An examination of the boosting behavior shows that, as expected, the odor attribute was chosen by the weak learner (decision stump), for many of the boosting iterations. Each time the instance weight distribution caused the learner to select a different attribute, the next iteration odor was again the attribute chosen.
+
+
+\subsection{Support Vector Machines}
+%You should implement (for sufficently loose definitions of implement including download) SVMs. This should be done in such a way that you can swap out kernel functions. I'd like to see at least two.
+
+The SVM performance in the initial experiment performed well in regards to quickly converging to low classification error with just over 500 samples. This learner also performed quite consistently at the low test error rate as more training data was added. The SVM training times were the second highest, being consistently double to triple that of the other eager learners. It was still significantly faster than the neural network. Even after dropping the 63 nodes in the hidden layer, the neural network was still significantly slower than SVM at the same training set size.
+
+Follow up experiments were performed to see how changes to the SVM kernel would affect it's performance. It can be seen from Figure~\ref{ag-svm-poly} that using a polynomial kernel function with degree 6 produced the smallest classification error (2\%), which is significantly lower than that achieved by the linear kernel (7\%).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/svm/polynomial.pdf}
+    \caption{Mushroom - error by svm polynomial kernel exponent \label{ag-svm-poly}}
+\end{figure} 
+
+The SVM kernel was then changed to a radial basis kernel to evaluate it's behavior. Figure~\ref{ag-svm-rbf} shows that the smallest classification error (2\%) was reached with a gamma of 0.225. This is the same error as that found using the degree 6 polynomial kernel. However, the RBF kernel took twice as long to train (0.8 sec vs. 0.4).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/svm/rbf.pdf}
+    \caption{Mushroom - error by svm rbf gamma\label{ag-svm-rbf}}
+\end{figure} 
+
+\subsection{k-nearest neighbor}
+%You should implement kNN. Use different values of k.
+
+Initial performance results, with a single nearest neighbor, show a classification error of 3\%. Figure~\ref{ag-knn-k} shows the results of experimenting with various values for k. The plot indicates that k=3 lowered the error on a 1,000 instance training set to 2.5\%. 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{data/agaricus-lepiota/k-nn/k.pdf}
+    \caption{Mushroom - error by number of k-nn neighbors\label{ag-knn-k}}
+\end{figure} 
+
+
+
+
+
+
 
 \section{Analysis}
 

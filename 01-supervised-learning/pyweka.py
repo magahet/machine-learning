@@ -14,7 +14,7 @@ def drange(start, stop, step):
         r += step
 
 
-def run_multiple_samples_and_classifiers(_dir='.'):
+def run_multiple_samples_and_classifiers(names, _dir='.'):
     if not os.path.exists(_dir):
         os.makedirs(_dir)
     if not os.path.exists('{}'.format(_dir)):
@@ -23,37 +23,36 @@ def run_multiple_samples_and_classifiers(_dir='.'):
     group_dir = '{}/k-nn'.format(_dir)
     if not os.path.exists(group_dir):
         os.makedirs(group_dir)
-    profiles = {
-        #'c4.5': (c.j48, range(10, 2001, 10), ''),
-        #'boosting-stump': (c.boost_stump, range(10, 2001, 10),  ''),
-        #'perceptron': (c.perceptron, range(10, 2001, 10),  ''),
-        #'svm-polykernel': (c.svm, range(10, 2001, 10),  ''),
-        #'k-nn-1': (c.ibk, range(10, 2001, 10),  '-K 1'),
-        #'k-nn-3': (c.ibk, range(10, 2001, 10),  '-K 3'),
-        #'k-nn-5': (c.ibk, range(10, 2001, 10),  '-K 5'),
+    experiments = {
+        'c4.5': (c.j48, range(10, 2001, 10), ''),
+        'boosting-stump': (c.boost_stump, range(10, 2001, 10),  ''),
+        'perceptron': (c.perceptron, range(10, 2001, 10),  ''),
+        'svm-polykernel': (c.svm, range(10, 2001, 10),  ''),
+        'k-nn-1': (c.ibk, range(10, 2001, 10),  '-K 1'),
 
-        #'learning-rate': (c.perceptron, 1000,  ['-L {}'.format(n) for n in drange(0.1, 10, 0.1)]),
-        #'momentum': (c.perceptron, 1000,  ['-M {}'.format(n) for n in drange(0.1, 10, 0.1)]),
-        #'iterations': (c.perceptron, 1000,  ['-N {}'.format(n) for n in range(10, 2001, 10)]),
+        'learning-rate': (c.perceptron, 1000,  ['-L {}'.format(n) for n in drange(0.1, 1, 0.1)]),
+        'momentum': (c.perceptron, 1000,  ['-M {}'.format(n) for n in drange(0.1, 1, 0.1)]),
+        'iterations': (c.perceptron, 1000,  ['-N {}'.format(n) for n in range(10, 1001, 10)]),
 
-        #'boosting-stump': (c.boost_stump, [1000],  ['-I {}'.format(n) for n in range(1, 1001, 1)]),
+        'boosting-stump': (c.boost_stump, [1000],  ['-I {}'.format(n) for n in range(1, 1001, 1)]),
 
-        #'svm-polykernel': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.PolyKernel -E {}"'.format(n) for n in range(1, 11)]),
-        #'svm-rbf': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.RBFKernel -G {}"'.format(n) for n in drange(0.001, 0.4, 0.001)]),
+        'svm-polykernel': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.PolyKernel -E {}"'.format(n) for n in range(1, 11)]),
+        'svm-rbf': (c.svm, [1000],  ['-K "weka.classifiers.functions.supportVector.RBFKernel -G {}"'.format(n) for n in drange(0.001, 0.4, 0.001)]),
 
         'k-nn': (c.ibk, 1000,  ['-K {}'.format(n) for n in range(1, 101)]),
     }
 
-    results_list = []
-    for name, p in profiles.iteritems():
-        print name
+    results = {}
+    for name, p in experiments.iteritems():
+        if name not in names:
+            continue
         if os.path.exists('{}/{}.pkl'.format(group_dir, name)):
             t.load_results('{}/{}.pkl'.format(group_dir, name))
         else:
             t.run_multiple_tests(*p)
             t.save_results('{}/{}.pkl'.format(group_dir, name))
-        results_list.append(t.results)
-    return results_list
+        results[name] = t.results
+    return results
     #f, a = t.plot_result('sample_size', 'training_error', '{} training error by training size'.format(name))
         #f.savefig('{}/train-error-{}.pdf'.format(group_dir, name))
         #f, a = t.plot_result('sample_size', 'testing_error', '{} testing error by training size'.format(name))
