@@ -1,0 +1,193 @@
+\documentclass{sig-alternate}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\maketitle}{\@copyrightspace}{}{}{}
+\makeatother
+
+\usepackage[caption=false]{subfig}
+\usepackage{verbatimbox}
+\providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
+
+
+
+\begin{document}
+
+\title{Randomized Optimization, Unsupervised Learning, and Dimensionality Reduction}
+\subtitle{Writeup for Assignment 02 - CS 6741}
+
+\author{
+\alignauthor
+Magahet Mendiola
+}
+\date{}
+
+\maketitle
+\begin{abstract}
+An empirical analysis of randomized optimization, clustering, and dimensionality reduction algorithms.
+\end{abstract}
+
+\section{Part 1: Randomized Optimization}
+
+In order to compare and contrast the given randomized optimization algorithms, a classification task was taken from the previous assignment and each algorithm was utilized to train a neural network to perform this task. Implementation of each algorithm as well as the code for running the neural network was taken from the ABAGAIL machine learning library (https://github.com/pushkar/ABAGAIL).
+
+\subsection{Neural Network Training}
+
+\paragraph{Classification Task}
+
+The dataset used to test our neural network optimization task was the Adult dataset from the UCI repository. This was the second of the two classification datasets used in the supervised learning assignment. To recap, these are samples of personal socioeconomic attributes with a binary classification of gross net income over or below 50k/yr.
+
+This dataset should prove interesting as an optimization task, since we have a fairly clear intuition of the relationship between the attributes and the classifications. From the previous assignment, we could see that attributes such as capital gain or loss had a strong linear relationship to the classification, as did education level. Intuition, or in this context domain knowledge, suggests that the fitness function for our neural network will have a smooth surface with predictable gradients. This is due to belief that having a slightly higher or lower education level would have a slightly higher or lower (mostly predictable) impact on one's net worth. In the case of our neural network, the actual fitness function is the sum of squared errors between the network's output and the actual instance binary values.
+
+The optimization task was run against a training set of 1,000 instances from the adult dataset and final classification error was then measured with a separate testing set of another 1,000 instances. 19 attributes were used from the set and nominal attributes were first converted into separate binary attributes.
+
+\paragraph{Optimization Parameters}
+
+Randomized hill climbing, simulated annealing, a genetic algorithm, and gradient decent were all utilized to train the weights for our neural network. The network consisted of 19 input nodes, 5 hidden nodes, and 1 output node. Each algorithm was given 1,000 training iterations to find an optimum set of weights. Simulated annealing was set with an initial temperature of 1\e{11} and a cooling exponent of 0.95. The genetic algorithm used a population of 200 with a set of 100 used for crossover and another 10 used for mutation.
+
+\paragraph{Optimization Results}
+
+Using three randomized optimization algorithms, our neural network was trained over 1000 iterations each. The classification accuracy of each of these trained networks is shown in Figure~\ref{ann-error-summary}. As shown, randomized hill climbing outperformed the rest both in terms of training the network to correctly classify instances and in the time required to train the network. Simulated Annealing was negligibly faster, but the resulting network did not perform as well in the classification task.
+
+\begin{verbbox}
+Results for RHC: 
+Correctly classified 764.0 instances.
+Incorrectly classified 236.0 instances.
+Percent correctly classified: 76.400%
+Training time: 3.709 seconds
+Testing time: 0.004 seconds
+
+Results for SA: 
+Correctly classified 733.0 instances.
+Incorrectly classified 267.0 instances.
+Percent correctly classified: 73.300%
+Training time: 3.023 seconds
+Testing time: 0.004 seconds
+
+Results for GA: 
+Correctly classified 763.0 instances.
+Incorrectly classified 237.0 instances.
+Percent correctly classified: 76.300%
+Training time: 72.068 seconds
+Testing time: 0.004 seconds
+
+Results for GD: 
+Correctly classified 725.0 instances.
+Incorrectly classified 175.0 instances.
+Percent correctly classified: 72.500%
+Training time: 6.560 seconds
+Testing time: 0.004 seconds
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{Randomized optimization training on ANN results\label{ann-error-summary}}s the error rate does not seem to stabilize over the 1,000 iterations, an additional experiment was performed to see if it could continue to improve the weights if allowed to run for 10,000 iterations. The results are shown in Figure~\ref{error-rhc-10x}. You can see that the algorithm continues to find weights that result in a lower classification error on the training set. However, the resulting network resulted in almost the same classification error when run against the set aside testing set. This result illustrates the previous understanding of neural network performance and it's ability to overfit the training data.
+
+\end{figure}
+
+This result reinforces our intuition regarding the dataset. Randomized hill climbing is similar to gradient decent in that the algorithm makes small changes in a direction that improves the fitness function result. Since we believe the profile of the adult dataset to be smooth and behaves predictably given changes in the inputs, both gradient decent and randomized hill climbing should move quickly toward a local minimum. In this case, since simulated annealing and the genetic algorithm did not find a solution that performed better than these two, we make the claim that this local minimum is in fact the global minimum.
+
+\paragraph{Training Performance}
+
+It is interesting to note the performance of each algorithm throughout the set of training cycles. This gives a better picture of how each optimization process interacted with the fitness function. In the case of randomized hill climbing (Figure~\ref{error-rhc}) the learning curve appears to smoothly converge toward lower classification error rates. This shows that the algorithm works well in this case in moving the fitness function step by step towards an optimum.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part1.1/error-rhc.pdf}
+    \caption{randomized hill climbing ANN classification error by training iterations \label{error-rhc}}
+\end{figure} 
+
+As the error rate does not seem to stabilize over the 1,000 iterations, an additional experiment was performed to see if it could continue to improve the weights if allowed to run for 10,000 iterations. The results are shown in Figure~\ref{error-rhc-10x}. You can see that the algorithm continues to find weights that result in a lower classification error on the training set. However, the resulting network resulted in almost the same classification error when run against the set aside testing set. This result illustrates the previous understanding of neural network performance and it's ability to overfit the training data.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part1.1/error-rhc.pdf}
+    \caption{randomized hill climbing ANN classification error by training iterations \label{error-rhc}}
+\end{figure} 
+
+Figure~\ref{error-sa} shows the results of simulated annealing over the 1,000 training iterations. We see that, unlike randomized hill climbing, the error increases for more than a single iteration, and increases more towards the beginning of the process. When the algorithm fist starts, temperature is still high enough to allow movement toward less optimal results. Around 300 iterations in we see a dramatic improvement in the error. As the temperature cools, the variation in error decreases and the algorithm converges toward local optimum. In this particular optimization problem, the result of this movement in sub-optimal directions most likely caused a delay in reaching an optimal point. However, given a fitness function with a number of local optima, this behavior would have helped to discover remote valleys.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part1.1/error-sa.pdf}
+    \caption{simulated annealing ANN classification error by training iterations \label{error-sa}}
+\end{figure} 
+
+Our genetic algorithm converged very quickly toward an optimum set of weights. However, elapsed time was an order of magnitude greater than any of the other optimization algorithms. This is likely due to the computation involved in maintaining the population and performing crossover and mutation functions. This can be somewhat offset by the fact that the genetic algorithm reached a optimum set of weights in roughly half the number of iterations, but that still puts elapsed time near five times that of the others.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part1.1/error-ga.pdf}
+    \caption{genetic algorithm ANN classification error by training iterations \label{error-ga}}
+\end{figure} 
+
+
+randomized hill climbing
+simulated annealing
+a genetic algorithm
+MIMIC
+
+%You will then use the first three algorithms to find good weights for a neural network. In particular, you will use them instead of backprop for the neural network you used in assignment #1 on at least one of the problems you created for assignment #1. Notice that weights in a neural network are continuous and real-valued instead of discrete so you might want to think a little bit about what it means to apply these sorts of algorithms in such a domain.
+
+\subsection{Fitness Functions}
+
+\subsubsection{1 }
+\subsubsection{2 }
+\subsubsection{3 }
+
+%In addition to finding weights for a neural network, you must create three optimization problem domains on your own. For the purpose of this assignment an optimization problem is just a fitness function one is trying to maximize (as opposed to a cost function one is trying to minimize). This doesn't make things easier or harder, but picking one over the other makes things easier for us to grade.
+
+%Please note that the problems you create should be over discrete-valued parameter spaces. Bit strings are preferable.
+
+%The first problem should highlight advantages of your genetic algorithm, the second of simulated annealing, and the third of MIMIC. Be creative and thoughtful. It is not required that the problems be complicated or painful. They can be simple. For example, the 4-peaks and k-color problems are rather straightforward, but illustrate relative strengths rather neatly.
+
+
+\section{Part 2: Unsupervised Learning Algorithms}
+
+%You are to run a number of experiments. Come up with at least two datasets. If you'd like (and it makes a lot of sense in this case) you can use the ones you used in the first assignment or, if it makes any sense, the first part of this assignment.
+
+%Run the clustering algorithms on the data sets and describe what you see.
+%Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
+%Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
+%Apply the dimensionality reduction algorithms to one of your datasets from assignment #1 (if you've reused the datasets from assignment #1 to do experiments 1-3 above then you've already done this) and rerun your neural network learner on the newly projected data.
+%Apply the clustering algorithms to the same dataset to which you just applied the dimensionality reduction algorithms (you've probably already done this), treating the clusters as if they were new features. In other words, treat the clustering algorithms as if they were dimensionality reduction algorithms. Again, rerun your neural network learner on the newly projected data.
+
+\subsection{Clustering}
+
+
+k-means clustering
+Expectation Maximization
+
+%You can choose your own measures of distance/similarity. Naturally, you'll have to justify your choices, but you're practiced at that sort of thing by now.
+
+
+\subsection{Dimensionality Reduction}
+
+PCA
+ICA
+Randomized Projections
+Any other feature selection algorithm you desire
+
+
+
+
+\begin{thebibliography}{10}
+
+\bibitem{Bache+Lichman:2013}
+K. Bache and M. Lichman
+\newblock UCI Machine Learning Repository
+\newblock 2013
+\newblock http://archive.ics.uci.edu/ml
+\newblock University of California, Irvine, School of Information and Computer Sciences
+
+%\bibitem{Zhong:Osteo}
+%L.~Zhong, D.~El-Daye, B.~Kaufman, N.~Tobaoda, T.~Mohamed, and M.~Liebschner.
+%\newblock Osteoconduct: Wireless body-area communication based on bone
+  %conduction.
+%\newblock In {\em in Proc. Int. Conf. Body Area Networks (BodyNets)}, June
+  %2007.
+
+\end{thebibliography}
+\end{document}
