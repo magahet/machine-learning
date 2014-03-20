@@ -47,8 +47,9 @@ public class PlotEvaluationFunctions {
         }
         int maxInt = (int) Math.pow(2, N);
 
+        EvaluationFunction ef = new IntEvaluationFunction();
         //EvaluationFunction ef = new CountOnesEvaluationFunction();
-        EvaluationFunction ef = new FourPeaksEvaluationFunction(N/10);
+        //EvaluationFunction ef = new FourPeaksEvaluationFunction(N/10);
         //EvaluationFunction ef = new FlipFlopEvaluationFunction();
 
         for (int i = 0; i < maxInt; i++) {
