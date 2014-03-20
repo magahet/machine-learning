@@ -34,12 +34,13 @@ import shared.Instance;
  */
 public class PlotEvaluationFunctions {
     /** The n value */
-    private static int N = 80;
+    private static int N = 8;
     
     public static void main(String[] args) {
+        int evalChoice = 0;
         if (args.length > 0) {
             try {
-                N = Integer.parseInt(args[0]);
+                evalChoice = Integer.parseInt(args[0]);
             } catch (NumberFormatException e) {
                 System.err.println("Argument" + args[0] + " must be an integer.");
                 System.exit(1);
@@ -47,10 +48,11 @@ public class PlotEvaluationFunctions {
         }
         int maxInt = (int) Math.pow(2, N);
 
-        EvaluationFunction ef = new IntEvaluationFunction();
-        //EvaluationFunction ef = new CountOnesEvaluationFunction();
-        //EvaluationFunction ef = new FourPeaksEvaluationFunction(N/10);
-        //EvaluationFunction ef = new FlipFlopEvaluationFunction();
+        EvaluationFunction[] ef = new EvaluationFunction[4];
+        ef[0] = new IntEvaluationFunction();
+        ef[1] = new CountOnesEvaluationFunction();
+        ef[2] = new FourPeaksEvaluationFunction(N/10);
+        ef[3] = new FlipFlopEvaluationFunction();
 
         for (int i = 0; i < maxInt; i++) {
             int x = i;
@@ -64,7 +66,7 @@ public class PlotEvaluationFunctions {
                 x >>= 1;
             }
             //System.out.println(Arrays.toString(digits) + ", " + ef.value(new Instance(digits)));
-            System.out.println(ef.value(new Instance(digits)));
+            System.out.println(ef[evalChoice].value(new Instance(digits)));
         }
     }
 }
