@@ -20,6 +20,11 @@ public class GenericOptimizationProblem implements OptimizationProblem {
      */
     private Distribution initial;
 
+    /**
+     * Count of eval calls
+     */
+    private long evalCount = 0;
+
     
     /**
      * Make a new generic optimization problem
@@ -36,6 +41,7 @@ public class GenericOptimizationProblem implements OptimizationProblem {
      * @see opt.OptimizationProblem#value(opt.OptimizationData)
      */
     public double value(Instance d) {
+        evalCount++;
         return eval.value(d);
     }
 
@@ -46,5 +52,14 @@ public class GenericOptimizationProblem implements OptimizationProblem {
     public Instance random() {
         return initial.sample(null);
     }
+
+
+    /**
+     * @see opt.OptimizationProblem#getEvalCount()
+     */
+    public long getEvalCount() {
+        return evalCount;
+    }
+
 
 }

@@ -47,6 +47,11 @@ public class StandardGeneticAlgorithm extends OptimizationAlgorithm {
      * The values of the population
      */
     private double[] values;
+
+    /**
+     * Count of eval calls
+     */
+    private long evalCount = 0;
     
     /**
      * Make a new genetic algorithm
@@ -67,6 +72,7 @@ public class StandardGeneticAlgorithm extends OptimizationAlgorithm {
         values = new double[populationSize];
         for (int i = 0; i < values.length; i++) {
             values[i] = gap.value(population[i]);
+            evalCount++;
         }
     }
 
@@ -116,6 +122,7 @@ public class StandardGeneticAlgorithm extends OptimizationAlgorithm {
         for (int i = 0; i < newValues.length; i++) {
             if (newValues[i] == -1) {
                 newValues[i] = ga.value(newPopulation[i]);
+                evalCount++;
             }
         }
         // the new generation
@@ -141,4 +148,10 @@ public class StandardGeneticAlgorithm extends OptimizationAlgorithm {
         return population[best];
     }
 
+    /**
+     * @see opt.OptimizationProblem#getEvalCount()
+     */
+    public long getEvalCount() {
+        return evalCount;
+    }
 }

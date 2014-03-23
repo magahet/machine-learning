@@ -29,6 +29,14 @@ public abstract class OptimizationAlgorithm implements Trainer {
     public OptimizationProblem getOptimizationProblem() {
         return op;
     }
+
+    /**
+     * Get evalCount
+     * @return the problem
+     */
+    public long getEvalCount() {
+        return op.getEvalCount();
+    }
     
     /**
      * Get the optimal data

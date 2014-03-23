@@ -20,6 +20,11 @@ public class SimulatedAnnealing extends OptimizationAlgorithm {
      * The current optimization value
      */
     private double curVal;
+
+    /**
+     * The initial temperature
+     */
+    private double iT;
     
     /**
      * The current temperature
@@ -32,6 +37,11 @@ public class SimulatedAnnealing extends OptimizationAlgorithm {
     private double cooling;
     
     /**
+     * Count of same value
+     */
+    private long sameCount = 0;
+    
+    /**
      * Make a new simulated annealing hill climbing
      * @param t the starting temperature
      * @param cooling the cooling exponent
@@ -40,6 +50,7 @@ public class SimulatedAnnealing extends OptimizationAlgorithm {
     public SimulatedAnnealing(double t, double cooling, HillClimbingProblem hcp) {
         super(hcp);
         this.t = t;
+        this.iT = t;
         this.cooling = cooling;
         this.cur = hcp.random();
         this.curVal = hcp.value(cur);
@@ -56,6 +67,13 @@ public class SimulatedAnnealing extends OptimizationAlgorithm {
                 Math.exp((neighVal - curVal) / t)) {
             curVal = neighVal;
             cur = neigh;
+            //sameCount = 0;
+        //} else if (sameCount > cur.size()) {
+            //cur = p.random();
+            //curVal = p.value(cur);
+            //t = iT;
+        //} else {
+            //sameCount++;
         }
         t *= cooling;
         return curVal;

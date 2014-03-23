@@ -6,3 +6,4 @@ def plot(filename):
     a = [float(l.strip()) for l in open(filename).readlines()]
     axes.plot(range(len(a)), a)
     fig.show()
+    return fig, axes

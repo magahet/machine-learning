@@ -22,4 +22,10 @@ public interface OptimizationProblem {
      */
     public abstract Instance random();
 
+    /**
+     * Return evalCount.
+     * @return the eval count
+     */
+    public abstract long getEvalCount();
+
 }

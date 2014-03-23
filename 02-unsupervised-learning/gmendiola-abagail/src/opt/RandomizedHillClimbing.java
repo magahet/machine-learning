@@ -18,6 +18,11 @@ public class RandomizedHillClimbing extends OptimizationAlgorithm {
      * The current value of the data
      */
     private double curVal;
+
+    /**
+     * Count of same value
+     */
+    private long sameCount = 0;
     
     /**
      * Make a new randomized hill climbing
@@ -38,6 +43,12 @@ public class RandomizedHillClimbing extends OptimizationAlgorithm {
         if (neighVal > curVal) {
             curVal = neighVal;
             cur = neigh;
+            sameCount = 0;
+        } else if (sameCount > cur.size()) {
+            cur = hcp.random();
+            curVal = hcp.value(cur);
+        } else {
+            sameCount++;
         }
         return curVal;
     }

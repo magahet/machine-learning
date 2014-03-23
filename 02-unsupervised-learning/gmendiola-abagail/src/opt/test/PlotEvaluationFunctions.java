@@ -49,7 +49,7 @@ public class PlotEvaluationFunctions {
         int maxInt = (int) Math.pow(2, N);
 
         EvaluationFunction[] ef = new EvaluationFunction[4];
-        ef[0] = new IntEvaluationFunction();
+        ef[0] = new EntropyEvaluationFunction();
         ef[1] = new CountOnesEvaluationFunction();
         ef[2] = new FourPeaksEvaluationFunction(N/10);
         ef[3] = new FlipFlopEvaluationFunction();
@@ -65,7 +65,7 @@ public class PlotEvaluationFunctions {
                 // Shift off that bit moving the next bit into place
                 x >>= 1;
             }
-            //System.out.println(Arrays.toString(digits) + ", " + ef.value(new Instance(digits)));
+            //System.out.println(Arrays.toString(digits) + ", " + ef[evalChoice].value(new Instance(digits)));
             System.out.println(ef[evalChoice].value(new Instance(digits)));
         }
     }
