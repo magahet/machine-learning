@@ -217,17 +217,23 @@ MIMIC seemed to behave well in this case. Although it did not locate optimal val
 
 \subsubsection{Flip Flop}
 
+The flip flop fitness function is scored by adding one for each bit that has a different value than the next bit. There are two global optima for any given bit length and the function terrain is symmetrical over the input space, as we can see in Figure~\ref{plot-flip-flop}. This function combines features of both count ones and four peaks. It acts as a semi-structured function as each input bit has a relationship to the bit's on either side. However, there are two distinct optima with a completely opposite bit pattern.
+
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{part1.2/flip-flop-plot.pdf}
     \caption{fitness function plot - flip-flop\label{plot-flip-flop}}
 \end{figure} 
 
+Each of our three algorithms, not including random hill climbing, do well over time on this function. Simulated annealing is able to converge to high values of the function with significantly less evaluations than the other two. The genetic algorithm and MIMIC both move steadily toward higher values, but with many more evaluations. Mimic is able to do so with more consistent improvement and less variance in score along the way.
+
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{part1.2/flip-flop-over-time.pdf}
     \caption{fitness score by iteration - flip-flop\label{over-time-flip-flop}}
 \end{figure} 
+
+Each algorithm was able to find the one of the optima within a closer number of evaluations than the previous fitness functions (Figure~\ref{max-flip-flop}. However, simulated annealing still performed orders of magnitude better than both MIMIC and the genetic algorithm in this experiment. 
 
 \begin{figure}[!htbp]
     \centering
