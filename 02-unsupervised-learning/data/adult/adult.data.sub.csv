@@ -1,3 +1,4 @@
+age,education-num,'marital-status= Never-married','marital-status= Married-civ-spouse','marital-status= Divorced','marital-status= Married-spouse-absent','marital-status= Separated','marital-status= Married-AF-spouse','marital-status= Widowed','relationship= Not-in-family','relationship= Husband','relationship= Wife','relationship= Own-child','relationship= Unmarried','relationship= Other-relative',sex,capital-gain,capital-loss,hours-per-week,class
 39,13,1,0,0,0,0,0,0,1,0,0,0,0,0,0,2174,0,40,0
 50,13,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,13,0
 38,9,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,40,0
