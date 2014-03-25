@@ -82,8 +82,7 @@ Testing time: 0.004 seconds
 \begin{figure}[!htbp]
     \centering
     \theverbbox
-    \caption{Randomized optimization training on ANN results\label{ann-error-summary}}s the error rate does not seem to stabilize over the 1,000 iterations, an additional experiment was performed to see if it could continue to improve the weights if allowed to run for 10,000 iterations. The results are shown in Figure~\ref{error-rhc-10x}. You can see that the algorithm continues to find weights that result in a lower classification error on the training set. However, the resulting network resulted in almost the same classification error when run against the set aside testing set. This result illustrates the previous understanding of neural network performance and it's ability to overfit the training data.
-
+    \caption{Randomized optimization training on ANN results\label{ann-error-summary}}
 \end{figure}
 
 This result reinforces our intuition regarding the dataset. Randomized hill climbing is similar to gradient decent in that the algorithm makes small changes in a direction that improves the fitness function result. Since we believe the profile of the adult dataset to be smooth and behaves predictably given changes in the inputs, both gradient decent and randomized hill climbing should move quickly toward a local minimum. In this case, since simulated annealing and the genetic algorithm did not find a solution that performed better than these two, we make the claim that this local minimum is in fact the global minimum.
@@ -254,11 +253,76 @@ Each algorithm was able to find the one of the optima within a closer number of 
 
 \subsection{Exploring Dataset 1: Adult}
 
+The first dataset we will explore is the same as from Part 1, the Adult dataset from UCI. To begin, we should first examine the distribution of instances by their class label. As we see in Figure~\ref{adult-attr-class} and Figure~\ref{adult-parallel-class}, groupings by class seem to occur based on a attributes such as workclass, capital-gain, hour-per-week, and education. However, these groupings are not completely obvious and there are many non-conforming samples. As we will see with the results from our clustering task, the two class labels do not segment the data as well it could be done.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/attr-class.pdf}
+    \caption{dataset attributes - adult\label{adult-attr-class}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-class.pdf}
+    \caption{dataset parallel plot - adult\label{adult-parallel-class}}
+\end{figure} 
+
 \subsubsection{Clustering}
 
 %Run the clustering algorithms on the data sets and describe what you see.
 
-The weka implementation of expectation maximization clustering includes a process for iteratively determining the number of clusters given the 
+In order to determine the optimal value for K, we can iterate through increasing values and compare some metric that gives an idea of how well our data is segmented into each cluster. In our case, the expectation maximization algorithm was run with increasing values of K, and the resulting log likelihood value was compared. This is a default option in the Weka implementation of the algorithm. Larger and smaller values of K were run to validate the result through visual inspection of the resulting cluster features. For the Adult dataset, a cluster size of three resulted in the greatest log likelihood, and the clusters made sense when viewing the resulting cluster attributes.
+
+\tiny
+\begin{verbbox}
+Running k-means
+
+Within cluster sum of squared errors: 94691.74506148841
+Missing values globally replaced with mean/mode
+
+Cluster centroids:
+                                                              Cluster#
+Attribute                                Full Data                   0                   1                   2
+                                           (32561)              (7243)             (14601)             (10717)
+==============================================================================================================
+age                                        38.5816             43.6339             32.9471             42.8437
+workclass                                  Private             Private             Private             Private
+fnlwgt                                 189778.3665         187061.4272         192070.6165         188491.5931
+education                                  HS-grad           Bachelors             HS-grad             HS-grad
+education-num                              10.0807             12.6281              9.8104              8.7273
+marital-status                  Married-civ-spouse  Married-civ-spouse       Never-married  Married-civ-spouse
+occupation                          Prof-specialty      Prof-specialty        Adm-clerical        Craft-repair
+relationship                               Husband             Husband       Not-in-family             Husband
+race                                         White               White               White               White
+sex                                           Male                Male              Female                Male
+capital-gain                             1077.6488           3607.9214            269.1136            469.1444
+capital-loss                               87.3038            179.5659             50.7723             74.7204
+hours-per-week                             40.4375             45.0614             36.5254             42.6422
+native-country                       United-States       United-States       United-States       United-States
+class                                        <=50K                >50K               <=50K               <=50K
+\end{verbbox}
+\normalsize
+
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{Randomized optimization training on ANN results\label{kmeans-summary}}
+\end{figure}
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/attr-cluster.pdf}
+    \caption{dataset attributes - adult\label{adult-attr-cluster}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-cluster.pdf}
+    \caption{dataset parallel plot - adult\label{adult-parallel-cluster}}
+\end{figure} 
+
 
 \subsubsection{Dimensionality Reduction}
 
