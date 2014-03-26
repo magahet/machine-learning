@@ -7,6 +7,7 @@
 \usepackage[caption=false]{subfig}
 \usepackage{verbatimbox}
 \providecommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+\usepackage{enumitem}
 
 
 
@@ -253,7 +254,7 @@ Each algorithm was able to find the one of the optima within a closer number of 
 
 \subsection{Exploring Dataset 1: Adult}
 
-The first dataset we will explore is the same as from Part 1, the Adult dataset from UCI. To begin, we should first examine the distribution of instances by their class label. As we see in Figure~\ref{adult-attr-class} and Figure~\ref{adult-parallel-class}, groupings by class seem to occur based on a attributes such as workclass, capital-gain, hour-per-week, and education. However, these groupings are not completely obvious and there are many non-conforming samples. As we will see with the results from our clustering task, the two class labels do not segment the data as well it could be done.
+The first dataset we will explore is the same as from Part 1, the Adult dataset from UCI. To begin, we will first examine the distribution of instances by their class label. As we see in Figures~\ref{adult-attr-class}~and~\ref{adult-parallel-class}, groupings by class seem to occur based on attributes such as workclass, capital-gain, hour-per-week, and education. However, these groupings are not completely obvious and there are many non-conforming samples. As we will see with the results from our clustering task, the two class labels do not segment the data as well it could be done.
 
 \begin{figure}[!htbp]
     \centering
@@ -271,7 +272,40 @@ The first dataset we will explore is the same as from Part 1, the Adult dataset 
 
 %Run the clustering algorithms on the data sets and describe what you see.
 
-In order to determine the optimal value for K, we can iterate through increasing values and compare some metric that gives an idea of how well our data is segmented into each cluster. In our case, the expectation maximization algorithm was run with increasing values of K, and the resulting log likelihood value was compared. This is a default option in the Weka implementation of the algorithm. Larger and smaller values of K were run to validate the result through visual inspection of the resulting cluster features. For the Adult dataset, a cluster size of three resulted in the greatest log likelihood, and the clusters made sense when viewing the resulting cluster attributes.
+In order to determine the optimal value for K, we can iterate through increasing values and compare a metric that gives an idea of how well our data is segmented into each cluster. In this first case, the expectation maximization algorithm was run with increasing values of K, and the resulting log likelihood value was compared. This is a default option in the Weka implementation of the algorithm. Larger and smaller values of K were run to validate the result through visual inspection of the resulting cluster features. For the Adult dataset, a cluster size of three resulted in the greatest log likelihood, and the clusters made sense when viewing the resulting cluster attributes.
+
+Form the results of k-means (Figure~\ref{kmeans-summary}) and EM (Figure~\ref{kmeans-summary}) clustering, three distinct profiles emerge from the data:
+
+\paragraph{Cluster 1 - Young and poor}
+\begin{itemize}[itemsep=1pt]
+    \item Young (34)
+    \item Less educated (9.8)
+    \item Single (Never-married, Divorced, Separated, Widowed)
+    \item Works less hours (37.5)
+    \item Low income (<50k)
+\end{itemize}
+
+\paragraph{Cluster 2 - Older and experienced}
+\begin{itemize}[itemsep=1pt]
+    \item Older (43)
+    \item More educated (12.5)
+    \item Male
+    \item High cap gain/loss (5000/475)
+    \item Works more hours (44.8)
+    \item High income (>50k)
+\end{itemize}
+
+\paragraph{Cluster 3 - Older blue collar}
+\begin{itemize}[itemsep=1pt]
+    \item Older (43)
+    \item less educated (9.8)
+    \item Currently Married
+    \item Male
+    \item Works medium hours (43)
+    \item Low income (<50k)
+\end{itemize}
+
+
 
 \tiny
 \begin{verbbox}
@@ -281,46 +315,117 @@ Within cluster sum of squared errors: 94691.74506148841
 Missing values globally replaced with mean/mode
 
 Cluster centroids:
-                                                              Cluster#
-Attribute                                Full Data                   0                   1                   2
-                                           (32561)              (7243)             (14601)             (10717)
-==============================================================================================================
-age                                        38.5816             43.6339             32.9471             42.8437
-workclass                                  Private             Private             Private             Private
-fnlwgt                                 189778.3665         187061.4272         192070.6165         188491.5931
-education                                  HS-grad           Bachelors             HS-grad             HS-grad
-education-num                              10.0807             12.6281              9.8104              8.7273
-marital-status                  Married-civ-spouse  Married-civ-spouse       Never-married  Married-civ-spouse
-occupation                          Prof-specialty      Prof-specialty        Adm-clerical        Craft-repair
-relationship                               Husband             Husband       Not-in-family             Husband
-race                                         White               White               White               White
-sex                                           Male                Male              Female                Male
-capital-gain                             1077.6488           3607.9214            269.1136            469.1444
-capital-loss                               87.3038            179.5659             50.7723             74.7204
-hours-per-week                             40.4375             45.0614             36.5254             42.6422
-native-country                       United-States       United-States       United-States       United-States
-class                                        <=50K                >50K               <=50K               <=50K
+                                     Cluster#
+Attribute           Full Data               0              1              2
+                      (32561)          (7243)        (14601)        (10717)
+===========================================================================
+age                   38.5816         43.6339        32.9471        42.8437
+workclass             Private         Private        Private        Private
+fnlwgt            189778.3665     187061.4272    192070.6165    188491.5931
+education             HS-grad       Bachelors        HS-grad        HS-grad
+education-num         10.0807         12.6281         9.8104         8.7273
+marital-status        Married         Married  Never-married        Married
+occupation     Prof-specialty  Prof-specialty   Adm-clerical   Craft-repair
+relationship          Husband         Husband  Not-in-family        Husband
+race                    White           White          White          White
+sex                      Male            Male         Female           Male
+capital-gain        1077.6488       3607.9214       269.1136       469.1444
+capital-loss          87.3038        179.5659        50.7723        74.7204
+hours-per-week        40.4375         45.0614        36.5254        42.6422
+native-country  United-States   United-States  United-States  United-States
+class                   <=50K            >50K          <=50K          <=50K
 \end{verbbox}
 \normalsize
-
 
 \begin{figure}[!htbp]
     \centering
     \theverbbox
-    \caption{Randomized optimization training on ANN results\label{kmeans-summary}}
+    \caption{k-means clustering results\label{kmeans-summary}}
 \end{figure}
 
+
+\scriptsize
+\begin{verbbox}
+EM
+==
+
+Number of clusters selected by cross validation: 3
+
+
+                     Cluster
+Attribute                  0           1           2
+                      (0.53)      (0.18)      (0.28)
+=====================================================
+age
+  mean                34.4071     43.6058     43.2169
+  std. dev.           13.4275     11.5698     12.6479
+
+education-num
+  mean                 9.8028     12.4534        9.07
+  std. dev.            2.3915      2.2579      2.1192
+
+relationship
+   Not-in-family    7417.5347    732.4946    157.9707
+   Husband             6.5078    4459.228   8730.2642
+   Wife             1044.7802     372.591    153.6288
+   Own-child         4842.923     166.438      61.639
+   Unmarried        3189.2812    193.3051     66.4137
+   Other-relative    899.9176     41.2378     42.8447
+  [total]          17400.9445   5965.2944   9212.7611
+sex
+   Male             7798.0266   5069.9658   8925.0076
+   Female           9598.9179    891.3286    283.7535
+  [total]          17396.9445   5961.2944   9208.7611
+capital-gain
+  mean                  4.065   5506.3843     239.438
+  std. dev.           60.7467  16515.2342    873.4603
+
+capital-loss
+  mean                      0    475.4836      0.9942
+  std. dev.          402.9602    837.7166     25.1187
+
+hours-per-week
+  mean                37.5504     44.8544     43.0332
+  std. dev.           12.1264     11.7279     11.7133
+
+class
+   <=50K           16342.7922   1688.2196   6691.9882
+   >50K             1054.1523   4273.0749   2516.7729
+  [total]          17396.9445   5961.2944   9208.7611
+
+
+Time taken to build model (full training data) : 395.06 seconds
+
+=== Model and evaluation on training set ===
+
+Clustered Instances
+
+0      17815 ( 55%)
+1       4160 ( 13%)
+2      10586 ( 33%)
+
+Log likelihood: -46.47694
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{EM clustering results\label{em-summary}}
+\end{figure}
+
+Visualizing the samples based on their cluster assignments shows a somewhat clearer distinction than their class assignment plots. Figures~\ref{adult-attr-cluster}~and~\ref{adult-parallel-cluster} show these distributions. Figure~\ref{adult-parallel-cluster} provides a better picture of the groupings. We can see in this visualization how younger individuals cluster in their marital-status, relationship, capital gains, hours-per-week, and income class. Likewise, we see the profile pattern for the older, experienced, group (yellow). These individuals share the attributes of being older, having higher education levels, higher capital-gains, and more hours-per-week. It should be noted that although these grouping are clear enough to see upon examination, they do not stand out with complete distinctiveness. There is a significant amount of noise in the data, which many samples that do not conform the to complete set of common profile attributes.
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{part2/adult/attr-cluster.pdf}
-    \caption{dataset attributes - adult\label{adult-attr-cluster}}
+    \caption{dataset attributes by cluster - adult\label{adult-attr-cluster}}
 \end{figure} 
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{part2/adult/parallel-cluster.pdf}
-    \caption{dataset parallel plot - adult\label{adult-parallel-cluster}}
+    \caption{dataset parallel plot by cluster - adult\label{adult-parallel-cluster}}
 \end{figure} 
 
 
