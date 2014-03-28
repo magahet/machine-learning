@@ -585,14 +585,140 @@ Clustered Instances
 %Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
 
 
+
 \subsection{Neural Network Training}
+
+Using the Adult dataset, a neural network was trained with three sample inputs. First, the network was trained with the original features. The results of this are shown in Figure~\ref{ann-summary-original}. The main issue we see here is the amount of time it took to train this network. Since many of the 14 attributes are nominal, the dataset was processed with a nominal to binary attribute filter. This increased the number of attributes to 107. With this many input nodes, our neural network took significantly longer to train.
+
+
+\tiny
+\begin{verbbox}
+Time taken to build model: 115.76 seconds
+
+=== Evaluation on test split ===
+=== Summary ===
+
+Correctly Classified Instances        9390               84.8162 %
+Incorrectly Classified Instances      1681               15.1838 %
+Kappa statistic                          0.5291
+Mean absolute error                      0.1558
+Root mean squared error                  0.3563
+Relative absolute error                 42.7879 %
+Root relative squared error             84.0266 %
+Total Number of Instances            11071     
+
+=== Detailed Accuracy By Class ===
+
+       TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+         0.946     0.472      0.867     0.946     0.905      0.89      <=50K
+         0.528     0.054      0.752     0.528     0.62       0.895     >50K
+WAvg.    0.848     0.374      0.84      0.848     0.838      0.891
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 8016  454 |    a =  <=50K
+ 1227 1374 |    b =  >50K
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ANN results with original attributes - adult\label{ann-summary-original}}
+\end{figure}
 
 
 \subsubsection{Training on Dimensionally Reduced Dataset}
 %Apply the dimensionality reduction algorithms to one of your datasets from assignment #1 (if you've reused the datasets from assignment #1 to do experiments 1-3 above then you've already done this) and rerun your neural network learner on the newly projected data.
 
+Using the five principle components identified earlier, a new neural network was created. The resulting classifier performed slightly poorer than the first network. The full results are shown in Figure~\ref{ann-summary-pca}. The weighted f-score was slightly lower at 0.822. However, the time required to train this network was an order of magnitude less than with the original attributes (11 seconds).
 
-\subsubsection{Training on Dimensionally Reduced Dataset Clusters}
+
+\tiny
+\begin{verbbox}
+=== Summary ===
+
+Correctly Classified Instances       10400               82.7894 %
+Incorrectly Classified Instances      2162               17.2106 %
+Kappa statistic                          0.5057
+Mean absolute error                      0.2382
+Root mean squared error                  0.3404
+Total Number of Instances            12562     
+
+=== Detailed Accuracy By Class ===
+
+       TP Rate   FP Rate   Precision   Recall  F-Measure   ROC Area  Class
+         0.915     0.439      0.865     0.915     0.889      0.885     <=50K
+         0.561     0.085      0.681     0.561     0.615      0.885     >50K
+WAvg.    0.828     0.352      0.82      0.828     0.822      0.885
+
+=== Confusion Matrix ===
+
+    a    b   <-- classified as
+ 8672  809 |    a =  <=50K
+ 1353 1728 |    b =  >50K
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ANN results with PCA attributes\label{ann-summary-pca}}
+\end{figure}
+
+
+
+\subsubsection{Training with Clusters as Features}
+
+Using the cluster labels found from running the EM algorithm, we see that these new features work well as inputs for our neural network. Figure~\ref{ann-cluster-weights} shows that only one of the original attributes contributed more to the classification task than membership in one of the three clusters. 
+
+
+\scriptsize
+\begin{verbbox}
+=== Classifier model (full training set) ===
+
+Sigmoid Node 0
+    Inputs    Weights
+    Threshold    -17.01722606012109
+    Attrib age    -0.04311914552721472
+    Attrib fnlwgt    -1.100932504395319
+    Attrib education-num    -3.0179209181138433
+    Attrib capital-gain    -22.05996366406373
+    Attrib capital-loss    -2.6552854980340603
+    Attrib hours-per-week    -1.9397990427724914
+    Attrib cluster=cluster1    5.810438640239912
+    Attrib cluster=cluster2    6.456682699425463
+    Attrib cluster=cluster3    4.838382453840594
+Sigmoid Node 1
+    Inputs    Weights
+    Threshold    17.03124036918239
+    Attrib age    0.043119145527213236
+    Attrib fnlwgt    1.1009325043953322
+    Attrib education-num    3.017920918113866
+    Attrib capital-gain    22.05996366406516
+    Attrib capital-loss    2.6552854980341793
+    Attrib hours-per-week    1.939799042772536
+    Attrib cluster=cluster1    -5.796424331180166
+    Attrib cluster=cluster2    -6.442668390365682
+    Attrib cluster=cluster3    -4.824368144780805
+Class  <=50K
+    Input
+    Node 0
+Class  >50K
+    Input
+    Node 1
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ANN weights with cluster input nodes\label{ann-cluster-weights}}
+\end{figure}
+
+With these new features, we were able to filter most of the remaining attributes without affecting the accuracy of the classifier. The neural network, trained on nine attributes including three for cluster membership, resulted in a weighted f-score of 0.824. The original dataset included 107 attributes (mainly due to nominal to binary filtering). That network resulted in an f-score of 8.38 and required 10 times as long to train.
+
 
 %Apply the clustering algorithms to the same dataset to which you just applied the dimensionality reduction algorithms (you've probably already done this), treating the clusters as if they were new features. In other words, treat the clustering algorithms as if they were dimensionality reduction algorithms. Again, rerun your neural network learner on the newly projected data.
 
