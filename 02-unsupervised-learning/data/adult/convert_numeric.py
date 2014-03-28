@@ -8,6 +8,7 @@ import sys
 key = [
     [],
     [' State-gov', ' Self-emp-not-inc', ' Private', ' Federal-gov', ' Local-gov', ' ?', ' Self-emp-inc', ' Without-pay', ' Never-worked'],
+    [],
     [' Bachelors', ' HS-grad', ' 11th', ' Masters', ' 9th', ' Some-college', ' Assoc-acdm', ' Assoc-voc', ' 7th-8th', ' Doctorate', ' Prof-school', ' 5th-6th', ' 10th', ' 1st-4th', ' Preschool', ' 12th'],
     [],
     [' Never-married', ' Married-civ-spouse', ' Divorced', ' Married-spouse-absent', ' Separated', ' Married-AF-spouse', ' Widowed'],
@@ -27,19 +28,20 @@ key = [
 with open(sys.argv[1], 'rb') as csvfile:
     reader = csv.reader(csvfile, delimiter=',', quotechar="'")
     for n, row in enumerate(reader):
-        del row[2]
-        if n > 1000:
-            break
+        #del row[2]
+        #if n > 1000:
+            #break
         for col in range(len(row)):
-            if col in [9, 10]:
-                try:
-                    row[col] = int(math.log(int(row[col])))
-                except (ValueError, TypeError):
-                    pass
-            if col == len(row) - 1:
-                continue
+            #if col in [9, 10]:
+                #try:
+                    #row[col] = int(math.log(int(row[col])))
+                #except (ValueError, TypeError):
+                    #pass
+            #if col == len(row) - 1:
+                #continue
             try:
-                row[col] = key[col].index(row[col]) * (100 // len(key[col]))
+                row[col] = key[col].index(row[col])
+                #row[col] = key[col].index(row[col]) * (100 // len(key[col]))
             except ValueError:
                 pass
         print ','.join([str(i) for i in row])
