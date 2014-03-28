@@ -487,6 +487,45 @@ Clustering on the first five components from our resulting PCA features creates 
 
 \paragraph{ICA}
 
+Running independent component analysis on the dataset required a decision regarding the number of independent features to output. Without foreknowledge, experimentation was necessary to find an appropriate number of components. This was accomplished by iterating up to the original number of features, running ICA with that number of target components, and comparing the resulting kurtosis to determine how well ICA was able to pull independent features from the mixed uniform distribution. The intuition begin that a set of features with a high absolute biased kurtosis (zeroed at normal distribution), would indicate significant, independent, contributing features.
+
+The result of this experiments can be seen in Figure~\ref{ica-stats-adult}. From this data we can make an informed decision regarding how many components to output from ICA for use in our clustering task. 
+
+\tiny
+\begin{verbbox}
+  n  min/max                  mean            var         skew    kurtosis
+---  ------------------  ---------  -------------  -----------  ----------
+  1  (6.217, 6.21775)     6.21775      0           0             -3
+  2  (35.31, 45.3218)    40.3204      50.0296      2.15814e-15   -2
+  3  (6.214, 154.845)    60.4781    6729.09        0.683477      -1.5
+  4  (0.2694, 155.271)   45.5331    5423.68        1.11028       -0.703042
+  5  (0.2143, 155.314)   37.0787    4428.31        1.45134        0.180383
+  6  (1.399, 155.273)    35.3957    3554.86        1.67272        0.985259
+  7  (0.222, 155.400)    30.6465    3132.59        1.90229        1.84921
+  8  (0.0771, 155.355)   26.9649    2793.2         2.11254        2.72931
+  9  (0.2083, 155.775)   24.3725    2519.2         2.31297        3.63809
+ 10  (0.3312, 155.651)   22.0006    2291.2         2.49168        4.53032
+ 11  (0.4255, 155.747)   20.3085    2095.81        2.66496        5.44675
+ 12  (0.1315, 155.606)   19.2382    1914.82        2.8292         6.37344
+ 13  (0.1338, 155.619)   20.6722    1781.69        2.78072        6.45888
+ 14  (0.6387, 0.817448)   0.721304     0.00240131  0.167194      -0.364713
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ICA kurtosis stats by number of features - adult\label{ica-stats-adult}}
+\end{figure}
+
+Reducing to three components resulted in kurtosis of [6.2, 154.8, 20.3]. This signifies three, non-normally distributed, independent features. Performing EM and k-means clustering on the ICA filtered dataset resulted in a tight clusters (EM log likelihood: 23.5, k-means SSE: 270.4). Visualization of these clusters is shown in Figure~\ref{parallel-ica-cluster}. These show much more distinct groupings than with the original data. The EM clustering task took 12 seconds with these features, which is nearly half the time it required to process the original 14 features.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-ica-cluster.pdf}
+    \caption{parallel plot ica cluster - adult\label{parallel-ica-cluster}}
+\end{figure} 
+
 \paragraph{RP}
 
 Creating random projections of the dataset onto five components resulted in mixed behavior. The distribution of values for resulting features had significantly random and differing profiles. Clustering results using those features varied both in cluster concentrations and distribution of instances into each distribution. Over five separate runs of random projection and EM clustering, we see log likelihood figures between 30 and 50. These concentrations range above and below those achieved using the original 14 attributes. Run times for each experiment also varied significantly, ranging from 15 to 40 seconds. To compare, the same clustering task took 22 seconds on the original data.

@@ -3,6 +3,7 @@ import pandas
 import sys
 import scipy
 import numpy
+from tabulate import tabulate
 
 
 def run_ica(data, n):
@@ -12,15 +13,12 @@ def run_ica(data, n):
 
 def get_best_n(data):
     print 'finding best k'
-    max_k = -1
-    max_n = -1
+    results = []
     for n in range(1, data.shape[1]):
         result = run_ica(data, n)
-        k = max(numpy.absolute(scipy.stats.kurtosis(result)))
-        print n, k
-        max_k = k if k > max_k else max_k
-        max_n = n if k > max_k else max_n
-    return max_n
+        normalized_results = numpy.absolute(scipy.stats.kurtosis(result))
+        results.append([str(i) for i in scipy.stats.describe(normalized_results)])
+    print tabulate(results, headers=['n', 'max/min', 'mean', 'var', 'skew', 'kurtosis'])
 
 
 data = pandas.read_csv(sys.argv[1])
