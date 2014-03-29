@@ -625,161 +625,72 @@ The second dataset we will explore is the Iris dataset from UCI. This is a very 
 
 %Run the clustering algorithms on the data sets and describe what you see.
 
-As with our first dataset, the EM clustering algorithm was run against the iris dataset with automatic determination of the number of clusters. According to this process, splitting the data into five clusters resulted in the lowest log likelihood value. However, as we can see from 
-
-Form the results of k-means (Figure~\ref{kmeans-summary}) and EM (Figure~\ref{kmeans-summary}) clustering, three distinct profiles emerge from the data:
-
-\paragraph{Cluster 1 - Young and poor}
-\begin{itemize}[itemsep=1pt]
-    \item Young (34)
-    \item Less educated (9.8)
-    \item Single (Never-married, Divorced, Separated, Widowed)
-    \item Works less hours (37.5)
-    \item Low income (<50k)
-\end{itemize}
-
-\paragraph{Cluster 2 - Older and experienced}
-\begin{itemize}[itemsep=1pt]
-    \item Older (43)
-    \item More educated (12.5)
-    \item Male
-    \item High cap gain/loss (5000/475)
-    \item Works more hours (44.8)
-    \item High income (>50k)
-\end{itemize}
-
-\paragraph{Cluster 3 - Older blue collar}
-\begin{itemize}[itemsep=1pt]
-    \item Older (43)
-    \item less educated (9.8)
-    \item Currently Married
-    \item Male
-    \item Works medium hours (43)
-    \item Low income (<50k)
-\end{itemize}
-
-
-
-\tiny
-\begin{verbbox}
-Running k-means
-
-Within cluster sum of squared errors: 94691.74506148841
-Missing values globally replaced with mean/mode
-
-Cluster centroids:
-                                     Cluster#
-Attribute           Full Data               0              1              2
-                      (32561)          (7243)        (14601)        (10717)
-===========================================================================
-age                   38.5816         43.6339        32.9471        42.8437
-workclass             Private         Private        Private        Private
-fnlwgt            189778.3665     187061.4272    192070.6165    188491.5931
-education             HS-grad       Bachelors        HS-grad        HS-grad
-education-num         10.0807         12.6281         9.8104         8.7273
-marital-status        Married         Married  Never-married        Married
-occupation     Prof-specialty  Prof-specialty   Adm-clerical   Craft-repair
-relationship          Husband         Husband  Not-in-family        Husband
-race                    White           White          White          White
-sex                      Male            Male         Female           Male
-capital-gain        1077.6488       3607.9214       269.1136       469.1444
-capital-loss          87.3038        179.5659        50.7723        74.7204
-hours-per-week        40.4375         45.0614        36.5254        42.6422
-native-country  United-States   United-States  United-States  United-States
-class                   <=50K            >50K          <=50K          <=50K
-\end{verbbox}
-\normalsize
+As with our first dataset, the EM clustering algorithm was run against the iris dataset with automatic determination of the number of clusters. According to this process, splitting the data into five clusters resulted in the lowest log likelihood value (-1.6). As we can see from Figure~\ref{iris-parallel-cluster-5}, these clusters distinguish themselves mostly on the petal length and width attributes. However, distance between instances on those features appears to be greatest with two clusters. Figure~\ref{iris-parallel-cluster-2} shows the same parallel plot with just two clusters. The log likelihood for this grouping was -3.
 
 \begin{figure}[!htbp]
     \centering
-    \theverbbox
-    \caption{k-means clustering results\label{kmeans-summary}}
-\end{figure}
+    \includegraphics[width=3in]{part2/iris/parallel-cluster.pdf}
+    \caption{parallel plot with 5 clusters- iris\label{iris-parallel-cluster-5}}
+\end{figure} 
 
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/parallel-cluster-2.pdf}
+    \caption{parallel plot with 2 clusters- iris\label{iris-parallel-cluster-2}}
+\end{figure} 
+
+In the case of five clusters, each species class is made up of two clusters, with one cluster split between two of the classes. In the case of two clusters, one cluster matches perfectly with one of the classes, which the other cluster instances are equally distributed between the two remaining classes.
+
+Looking at the attribute scatter plots for two and five cluster assignments (Figures~\ref{iris-attr-scatter-cluster-2}~and~\ref{iris-attr-scatter-cluster-5}, we see that the inter-cluster distance is far greater with two clusters than with five. However, the five cluster result does seem to have fairly good linear separability between each attribute pair plot.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter-cluster-2.pdf}
+    \caption{attribute scatter with 2 clusters- iris\label{iris-attr-scatter-cluster-2}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter-cluster-5.pdf}
+    \caption{attribute scatter with 5 clusters- iris\label{iris-attr-scatter-cluster-5}}
+\end{figure} 
+
+Figure~\ref{iris-k-means-centroids} shows the k-means centroids for two clusters and the min and max values for each of the attributes. We can see that the separation between centroids for each attribute is significant within the range. This indicates a large inter-cluster spacing.
 
 \scriptsize
 \begin{verbbox}
-EM
-==
-
-Number of clusters selected by cross validation: 3
-
-
-                     Cluster
-Attribute                  0           1           2
-                      (0.53)      (0.18)      (0.28)
-=====================================================
-age
-  mean                34.4071     43.6058     43.2169
-  std. dev.           13.4275     11.5698     12.6479
-
-education-num
-  mean                 9.8028     12.4534        9.07
-  std. dev.            2.3915      2.2579      2.1192
-
-relationship
-   Not-in-family    7417.5347    732.4946    157.9707
-   Husband             6.5078    4459.228   8730.2642
-   Wife             1044.7802     372.591    153.6288
-   Own-child         4842.923     166.438      61.639
-   Unmarried        3189.2812    193.3051     66.4137
-   Other-relative    899.9176     41.2378     42.8447
-  [total]          17400.9445   5965.2944   9212.7611
-sex
-   Male             7798.0266   5069.9658   8925.0076
-   Female           9598.9179    891.3286    283.7535
-  [total]          17396.9445   5961.2944   9208.7611
-capital-gain
-  mean                  4.065   5506.3843     239.438
-  std. dev.           60.7467  16515.2342    873.4603
-
-capital-loss
-  mean                      0    475.4836      0.9942
-  std. dev.          402.9602    837.7166     25.1187
-
-hours-per-week
-  mean                37.5504     44.8544     43.0332
-  std. dev.           12.1264     11.7279     11.7133
-
-class
-   <=50K           16342.7922   1688.2196   6691.9882
-   >50K             1054.1523   4273.0749   2516.7729
-  [total]          17396.9445   5961.2944   9208.7611
+Cluster centroids:
+                                          Cluster#
+Attribute                Full Data               0               1
+                             (150)           (100)            (50)
+==================================================================
+sepallength                 5.8433           6.262           5.006
+sepalwidth                   3.054           2.872           3.418
+petallength                 3.7587           4.906           1.464
+petalwidth                  1.1987           1.676           0.244
+class                  Iris-setosa Iris-versicolor     Iris-setosa
 
 
-Time taken to build model (full training data) : 395.06 seconds
+Min and Max values:
 
-=== Model and evaluation on training set ===
+Attribute                
+                      min            max
+========================================
+sepallength           4.3            7.9  
+sepalwidth              2            4.4
+petallength             1            6.9
+petalwidth            0.1            2.5
 
-Clustered Instances
-
-0      17815 ( 55%)
-1       4160 ( 13%)
-2      10586 ( 33%)
-
-Log likelihood: -46.47694
 \end{verbbox}
 \normalsize
 
 \begin{figure}[!htbp]
     \centering
     \theverbbox
-    \caption{subset of EM clustering results\label{em-summary}}
+    \caption{k-means clustering centroids\label{iris-k-means-centroids}}
 \end{figure}
 
-Visualizing the samples based on their cluster assignments shows a somewhat clearer distinction than their class assignment plots. Figures~\ref{adult-attr-cluster}~and~\ref{adult-parallel-cluster} show these distributions. Figure~\ref{adult-parallel-cluster} provides a better picture of the groupings. We can see in this visualization how younger individuals cluster in their marital-status, relationship, capital gains, hours-per-week, and income class. Likewise, we see the profile pattern for the older, experienced, group (yellow). These individuals share the attributes of being older, having higher education levels, higher capital-gains, and more hours-per-week. It should be noted that although these grouping are clear enough to see upon examination, they do not stand out with complete distinctiveness. There is a significant amount of noise in the data, which many samples that do not conform the to complete set of common profile attributes.
 
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=3in]{part2/adult/attr-cluster.pdf}
-    \caption{dataset attributes by cluster - adult\label{adult-attr-cluster}}
-\end{figure} 
-
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=3in]{part2/adult/parallel-cluster.pdf}
-    \caption{dataset parallel plot by cluster - adult\label{adult-parallel-cluster}}
-\end{figure} 
 
 
 \subsubsection{Clustering on Dimensionally Reduced Dataset}
@@ -787,54 +698,43 @@ Visualizing the samples based on their cluster assignments shows a somewhat clea
 %Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
 
 \paragraph{PCA}
-Running PCA on the Adult dataset results in features with the characteristics shown in Figure~\ref{pca-adult}. The first few principle components capture 11\% of the dataset variance. The distribution of eigenvalues shows that the roughly the first five components distinguish themselves in regards to their contribution to the overall variance.
+Running PCA on the Iris dataset resulted in two principle components. Eigenvalues for these are shown in Figure~\ref{pca-iris}. The first principle component captures 72\% of the dataset variance. The second captures 23\% of the variance. Together they account for 96\% of the variance, which makes this dimensionally reduction quite successful at capturing the dataset information with a 60\% reduction in size.
 
 
 \begin{verbbox}
+Correlation matrix
+  1     -0.11   0.87   0.82 
+ -0.11   1     -0.42  -0.36 
+  0.87  -0.42   1      0.96 
+  0.82  -0.36   0.96   1    
+
+
 eigenvalue  proportion  cumulative
-4.13178     0.03861     0.03861
-2.89985     0.0271      0.06572
-2.5952      0.02425     0.08997
-2.42699     0.02268     0.11265
-2.23305     0.02087     0.13352
-1.90511     0.0178      0.15133
-1.63445     0.01528     0.1666 
-1.5871      0.01483     0.18143
-1.49286     0.01395     0.19539
-1.42284     0.0133      0.20868
-1.37072     0.01281     0.22149
-1.31255     0.01227     0.23376
-1.29281     0.01208     0.24584
-1.2507      0.01169     0.25753
-1.23304     0.01152     0.26906
-1.21991     0.0114      0.28046
-1.19888     0.0112      0.29166
-1.17351     0.01097     0.30263
-1.16087     0.01085     0.31348
-1.14374     0.01069     0.32417
-1.12887     0.01055     0.33472
-1.12004     0.01047     0.34519
-1.11544     0.01042     0.35561
-1.09716     0.01025     0.36586
-1.09448     0.01023     0.37609
-1.08928     0.01018     0.38627
-1.08335     0.01012     0.3964 
-1.07809     0.01008     0.40647
-1.06987     0.01        0.41647
+2.91082     0.7277      0.7277    componant01
+0.92122     0.23031     0.95801   componant02
+
+Eigenvectors
+ V1  V2 
+ 0.5224 -0.3723 sepallength
+-0.2634 -0.9256 sepalwidth
+ 0.5813 -0.0211 petallength
+ 0.5656 -0.0654 petalwidth
 \end{verbbox}
 
 \begin{figure}[!htbp]
     \centering
     \theverbbox
-    \caption{PCA eigenvalues - adult\label{pca-adult}}
+    \caption{PCA eigenvalues - iris\label{pca-iris}}
 \end{figure}
 
-Clustering on the first five components from our resulting PCA features creates clusters with much clearer distinctions than with the original 14 attributes. Figure~\ref{pca-cluster-scatter} shows the cluster assignments based on only the first component (spread out over the instance numbers). With just this single attribute, we can see a clearer segregation of our three clusters. Log likelihood from EM clustering came out to -9.15, which is significantly higher than -46.5 achieved with the original attributes. K-means clustering resulted in a similar plot, and a sum of squared errors within each cluster of 2,620.
+
+Clustering on these two components creates clusters with very clear distinctions, as we see in Figure~\ref{pca-cluster-scatter-iris}. Although the dataset could be partitioned into more clusters, the inter-cluster spacing seen here provides compelling evidence that two clusters describe the dataset quite well.
+
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=3in]{part2/adult/pca-cluster-scatter.pdf}
-    \caption{pca clusters on fist component - adult\label{pca-cluster-scatter}}
+    \includegraphics[width=3in]{part2/iris/pca-cluster-scatter.pdf}
+    \caption{pca scatter with 2 clusters - iris\label{pca-cluster-scatter-iris}}
 \end{figure} 
 
 
@@ -846,22 +746,11 @@ The result of this experiments can be seen in Figure~\ref{ica-stats-adult}. From
 
 \tiny
 \begin{verbbox}
-  n  min/max                  mean            var         skew    kurtosis
----  ------------------  ---------  -------------  -----------  ----------
-  1  (6.217, 6.21775)     6.21775      0           0             -3
-  2  (35.31, 45.3218)    40.3204      50.0296      2.15814e-15   -2
-  3  (6.214, 154.845)    60.4781    6729.09        0.683477      -1.5
-  4  (0.2694, 155.271)   45.5331    5423.68        1.11028       -0.703042
-  5  (0.2143, 155.314)   37.0787    4428.31        1.45134        0.180383
-  6  (1.399, 155.273)    35.3957    3554.86        1.67272        0.985259
-  7  (0.222, 155.400)    30.6465    3132.59        1.90229        1.84921
-  8  (0.0771, 155.355)   26.9649    2793.2         2.11254        2.72931
-  9  (0.2083, 155.775)   24.3725    2519.2         2.31297        3.63809
- 10  (0.3312, 155.651)   22.0006    2291.2         2.49168        4.53032
- 11  (0.4255, 155.747)   20.3085    2095.81        2.66496        5.44675
- 12  (0.1315, 155.606)   19.2382    1914.82        2.8292         6.37344
- 13  (0.1338, 155.619)   20.6722    1781.69        2.78072        6.45888
- 14  (0.6387, 0.817448)   0.721304     0.00240131  0.167194      -0.364713
+  n  max/min              mean       var      skew    kurtosis
+---  ---------------  --------  --------  --------  ----------
+  1  (1.371, 1.371)   1.37104   0         0               -3
+  2  (0.1654, 1.412)  0.791307  0.78235   0               -2
+  3  (0.1013, 1.429)  0.593179  0.526858  0.673098        -1.5
 \end{verbbox}
 \normalsize
 
