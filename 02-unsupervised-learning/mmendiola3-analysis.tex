@@ -566,24 +566,395 @@ Clustered Instances
 \end{figure}
 
 
+\paragraph{Information Gain Ratio}
 
+The final attribute selection algorithm tested was a filter based on attributes with the best information gain ratio. This showed positive results in reducing dimensions in classification tasks. For clustering, the attributes with the top five gain ratio values were used in the clustering task (Figure~\ref{gain-adult}).
+
+\begin{verbbox}
+Search Method:
+    Attribute ranking.
+
+Attribute Evaluator (supervised, Class (nominal): 15 class):
+    Gain Ratio feature evaluator
+
+Ranked attributes:
+ 0.1876  11 capital-gain
+ 0.1165  12 capital-loss
+ 0.0854   6 marital-status
+ 0.0768   8 relationship
+ 0.0406  10 sex
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{gain ratio selected attributes - adult\label{gain-adult}}
+\end{figure}
+
+
+The resulting clusters where not as distinguishable as those produced with PCA. Figure~\ref{parallel-gain-cluster} shows the resulting grouping after running EM clustering on the reduced dataset.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-gain-cluster.pdf}
+    \caption{gain-ratio clusters - adult\label{parallel-gain-cluster}}
+\end{figure} 
 
 %Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
 
-\subsection{Exploring Dataset 2: TODO}
+
+
+\subsection{Exploring Dataset 2: Iris}
+
+The second dataset we will explore is the Iris dataset from UCI. This is a very well studied dataset with a small sample size, which should help in understanding the effects of our clustering and dimensionality reduction algorithms. The distribution of instances by their class label is shown in Figure~\ref{iris-parallel-class}. Visually, we see two groupings based on petal length and width. However, the data is labeled with three classes (species). Once of these classes matches perfectly with one of the natural groupings, which the other two fall clearly into the other. This can also be seen in many of the attribute scatter plots (Figure~\ref{iris-attr-scatter}).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/parallel-class.pdf}
+    \caption{dataset parallel plot - iris\label{iris-parallel-class}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter.pdf}
+    \caption{attribute scatter plots - iris\label{iris-attr-scatter}}
+\end{figure} 
 
 \subsubsection{Clustering}
 
 %Run the clustering algorithms on the data sets and describe what you see.
 
-\subsubsection{Dimensionality Reduction}
+As with our first dataset, the EM clustering algorithm was run against the iris dataset with automatic determination of the number of clusters. According to this process, splitting the data into five clusters resulted in the lowest log likelihood value. However, as we can see from 
 
-%Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
+Form the results of k-means (Figure~\ref{kmeans-summary}) and EM (Figure~\ref{kmeans-summary}) clustering, three distinct profiles emerge from the data:
+
+\paragraph{Cluster 1 - Young and poor}
+\begin{itemize}[itemsep=1pt]
+    \item Young (34)
+    \item Less educated (9.8)
+    \item Single (Never-married, Divorced, Separated, Widowed)
+    \item Works less hours (37.5)
+    \item Low income (<50k)
+\end{itemize}
+
+\paragraph{Cluster 2 - Older and experienced}
+\begin{itemize}[itemsep=1pt]
+    \item Older (43)
+    \item More educated (12.5)
+    \item Male
+    \item High cap gain/loss (5000/475)
+    \item Works more hours (44.8)
+    \item High income (>50k)
+\end{itemize}
+
+\paragraph{Cluster 3 - Older blue collar}
+\begin{itemize}[itemsep=1pt]
+    \item Older (43)
+    \item less educated (9.8)
+    \item Currently Married
+    \item Male
+    \item Works medium hours (43)
+    \item Low income (<50k)
+\end{itemize}
+
+
+
+\tiny
+\begin{verbbox}
+Running k-means
+
+Within cluster sum of squared errors: 94691.74506148841
+Missing values globally replaced with mean/mode
+
+Cluster centroids:
+                                     Cluster#
+Attribute           Full Data               0              1              2
+                      (32561)          (7243)        (14601)        (10717)
+===========================================================================
+age                   38.5816         43.6339        32.9471        42.8437
+workclass             Private         Private        Private        Private
+fnlwgt            189778.3665     187061.4272    192070.6165    188491.5931
+education             HS-grad       Bachelors        HS-grad        HS-grad
+education-num         10.0807         12.6281         9.8104         8.7273
+marital-status        Married         Married  Never-married        Married
+occupation     Prof-specialty  Prof-specialty   Adm-clerical   Craft-repair
+relationship          Husband         Husband  Not-in-family        Husband
+race                    White           White          White          White
+sex                      Male            Male         Female           Male
+capital-gain        1077.6488       3607.9214       269.1136       469.1444
+capital-loss          87.3038        179.5659        50.7723        74.7204
+hours-per-week        40.4375         45.0614        36.5254        42.6422
+native-country  United-States   United-States  United-States  United-States
+class                   <=50K            >50K          <=50K          <=50K
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{k-means clustering results\label{kmeans-summary}}
+\end{figure}
+
+
+\scriptsize
+\begin{verbbox}
+EM
+==
+
+Number of clusters selected by cross validation: 3
+
+
+                     Cluster
+Attribute                  0           1           2
+                      (0.53)      (0.18)      (0.28)
+=====================================================
+age
+  mean                34.4071     43.6058     43.2169
+  std. dev.           13.4275     11.5698     12.6479
+
+education-num
+  mean                 9.8028     12.4534        9.07
+  std. dev.            2.3915      2.2579      2.1192
+
+relationship
+   Not-in-family    7417.5347    732.4946    157.9707
+   Husband             6.5078    4459.228   8730.2642
+   Wife             1044.7802     372.591    153.6288
+   Own-child         4842.923     166.438      61.639
+   Unmarried        3189.2812    193.3051     66.4137
+   Other-relative    899.9176     41.2378     42.8447
+  [total]          17400.9445   5965.2944   9212.7611
+sex
+   Male             7798.0266   5069.9658   8925.0076
+   Female           9598.9179    891.3286    283.7535
+  [total]          17396.9445   5961.2944   9208.7611
+capital-gain
+  mean                  4.065   5506.3843     239.438
+  std. dev.           60.7467  16515.2342    873.4603
+
+capital-loss
+  mean                      0    475.4836      0.9942
+  std. dev.          402.9602    837.7166     25.1187
+
+hours-per-week
+  mean                37.5504     44.8544     43.0332
+  std. dev.           12.1264     11.7279     11.7133
+
+class
+   <=50K           16342.7922   1688.2196   6691.9882
+   >50K             1054.1523   4273.0749   2516.7729
+  [total]          17396.9445   5961.2944   9208.7611
+
+
+Time taken to build model (full training data) : 395.06 seconds
+
+=== Model and evaluation on training set ===
+
+Clustered Instances
+
+0      17815 ( 55%)
+1       4160 ( 13%)
+2      10586 ( 33%)
+
+Log likelihood: -46.47694
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{subset of EM clustering results\label{em-summary}}
+\end{figure}
+
+Visualizing the samples based on their cluster assignments shows a somewhat clearer distinction than their class assignment plots. Figures~\ref{adult-attr-cluster}~and~\ref{adult-parallel-cluster} show these distributions. Figure~\ref{adult-parallel-cluster} provides a better picture of the groupings. We can see in this visualization how younger individuals cluster in their marital-status, relationship, capital gains, hours-per-week, and income class. Likewise, we see the profile pattern for the older, experienced, group (yellow). These individuals share the attributes of being older, having higher education levels, higher capital-gains, and more hours-per-week. It should be noted that although these grouping are clear enough to see upon examination, they do not stand out with complete distinctiveness. There is a significant amount of noise in the data, which many samples that do not conform the to complete set of common profile attributes.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/attr-cluster.pdf}
+    \caption{dataset attributes by cluster - adult\label{adult-attr-cluster}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-cluster.pdf}
+    \caption{dataset parallel plot by cluster - adult\label{adult-parallel-cluster}}
+\end{figure} 
+
 
 \subsubsection{Clustering on Dimensionally Reduced Dataset}
 
-%Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
+%Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
 
+\paragraph{PCA}
+Running PCA on the Adult dataset results in features with the characteristics shown in Figure~\ref{pca-adult}. The first few principle components capture 11\% of the dataset variance. The distribution of eigenvalues shows that the roughly the first five components distinguish themselves in regards to their contribution to the overall variance.
+
+
+\begin{verbbox}
+eigenvalue  proportion  cumulative
+4.13178     0.03861     0.03861
+2.89985     0.0271      0.06572
+2.5952      0.02425     0.08997
+2.42699     0.02268     0.11265
+2.23305     0.02087     0.13352
+1.90511     0.0178      0.15133
+1.63445     0.01528     0.1666 
+1.5871      0.01483     0.18143
+1.49286     0.01395     0.19539
+1.42284     0.0133      0.20868
+1.37072     0.01281     0.22149
+1.31255     0.01227     0.23376
+1.29281     0.01208     0.24584
+1.2507      0.01169     0.25753
+1.23304     0.01152     0.26906
+1.21991     0.0114      0.28046
+1.19888     0.0112      0.29166
+1.17351     0.01097     0.30263
+1.16087     0.01085     0.31348
+1.14374     0.01069     0.32417
+1.12887     0.01055     0.33472
+1.12004     0.01047     0.34519
+1.11544     0.01042     0.35561
+1.09716     0.01025     0.36586
+1.09448     0.01023     0.37609
+1.08928     0.01018     0.38627
+1.08335     0.01012     0.3964 
+1.07809     0.01008     0.40647
+1.06987     0.01        0.41647
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{PCA eigenvalues - adult\label{pca-adult}}
+\end{figure}
+
+Clustering on the first five components from our resulting PCA features creates clusters with much clearer distinctions than with the original 14 attributes. Figure~\ref{pca-cluster-scatter} shows the cluster assignments based on only the first component (spread out over the instance numbers). With just this single attribute, we can see a clearer segregation of our three clusters. Log likelihood from EM clustering came out to -9.15, which is significantly higher than -46.5 achieved with the original attributes. K-means clustering resulted in a similar plot, and a sum of squared errors within each cluster of 2,620.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/pca-cluster-scatter.pdf}
+    \caption{pca clusters on fist component - adult\label{pca-cluster-scatter}}
+\end{figure} 
+
+
+\paragraph{ICA}
+
+Running independent component analysis on the dataset required a decision regarding the number of independent features to output. Without foreknowledge, experimentation was necessary to find an appropriate number of components. This was accomplished by iterating up to the original number of features, running ICA with that number of target components, and comparing the resulting kurtosis to determine how well ICA was able to pull independent features from the mixed uniform distribution. The intuition begin that a set of features with a high absolute biased kurtosis (zeroed at normal distribution), would indicate significant, independent, contributing features.
+
+The result of this experiments can be seen in Figure~\ref{ica-stats-adult}. From this data we can make an informed decision regarding how many components to output from ICA for use in our clustering task. 
+
+\tiny
+\begin{verbbox}
+  n  min/max                  mean            var         skew    kurtosis
+---  ------------------  ---------  -------------  -----------  ----------
+  1  (6.217, 6.21775)     6.21775      0           0             -3
+  2  (35.31, 45.3218)    40.3204      50.0296      2.15814e-15   -2
+  3  (6.214, 154.845)    60.4781    6729.09        0.683477      -1.5
+  4  (0.2694, 155.271)   45.5331    5423.68        1.11028       -0.703042
+  5  (0.2143, 155.314)   37.0787    4428.31        1.45134        0.180383
+  6  (1.399, 155.273)    35.3957    3554.86        1.67272        0.985259
+  7  (0.222, 155.400)    30.6465    3132.59        1.90229        1.84921
+  8  (0.0771, 155.355)   26.9649    2793.2         2.11254        2.72931
+  9  (0.2083, 155.775)   24.3725    2519.2         2.31297        3.63809
+ 10  (0.3312, 155.651)   22.0006    2291.2         2.49168        4.53032
+ 11  (0.4255, 155.747)   20.3085    2095.81        2.66496        5.44675
+ 12  (0.1315, 155.606)   19.2382    1914.82        2.8292         6.37344
+ 13  (0.1338, 155.619)   20.6722    1781.69        2.78072        6.45888
+ 14  (0.6387, 0.817448)   0.721304     0.00240131  0.167194      -0.364713
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ICA kurtosis stats by number of features - adult\label{ica-stats-adult}}
+\end{figure}
+
+Reducing to three components resulted in kurtosis of [6.2, 154.8, 20.3]. This signifies three, non-normally distributed, independent features. Performing EM and k-means clustering on the ICA filtered dataset resulted in a tight clusters (EM log likelihood: 23.5, k-means SSE: 270.4). Visualization of these clusters is shown in Figure~\ref{parallel-ica-cluster}. These show much more distinct groupings than with the original data. The EM clustering task took 12 seconds with these features, which is nearly half the time it required to process the original 14 features.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-ica-cluster.pdf}
+    \caption{parallel plot ica cluster - adult\label{parallel-ica-cluster}}
+\end{figure} 
+
+\paragraph{RP}
+
+Creating random projections of the dataset onto five components resulted in mixed behavior. The distribution of values for resulting features had significantly random and differing profiles. Clustering results using those features varied both in cluster concentrations and distribution of instances into each distribution. Over five separate runs of random projection and EM clustering, we see log likelihood figures between 30 and 50. These concentrations range above and below those achieved using the original 14 attributes. Run times for each experiment also varied significantly, ranging from 15 to 40 seconds. To compare, the same clustering task took 22 seconds on the original data.
+
+The main issue with the random projection clustering results are with the distribution of instances across the identified clusters. Figure~\ref{rp-custer-dist-adult} shows distributions for each experiment run as well as from clustering on the original attributes. The distributions for remote projection runs show significant deviation, which indicates that EM and k-means clustering identified quite different cluster centroids for each projected dataset.
+
+\begin{verbbox}
+Cluster Distributions on Original Attributes
+
+Clustered Instances
+0      17815 ( 55%)
+1       4160 ( 13%)
+2      10586 ( 33%)
+
+
+Cluster Distributions on Random Projections
+
+Clustered Instances
+0       7515 ( 23%)
+1      20815 ( 64%)
+2       4231 ( 13%)
+
+Clustered Instances
+0       8684 ( 27%)
+1      16861 ( 52%)
+2       7016 ( 22%)
+
+Clustered Instances
+0       2226 (  7%)
+1       2005 (  6%)
+2      28330 ( 87%)
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{random projection cluster distributions - adult\label{rp-custer-dist-adult}}
+\end{figure}
+
+
+\paragraph{Information Gain Ratio}
+
+The final attribute selection algorithm tested was a filter based on attributes with the best information gain ratio. This showed positive results in reducing dimensions in classification tasks. For clustering, the attributes with the top five gain ratio values were used in the clustering task (Figure~\ref{gain-adult}).
+
+\begin{verbbox}
+Search Method:
+    Attribute ranking.
+
+Attribute Evaluator (supervised, Class (nominal): 15 class):
+    Gain Ratio feature evaluator
+
+Ranked attributes:
+ 0.1876  11 capital-gain
+ 0.1165  12 capital-loss
+ 0.0854   6 marital-status
+ 0.0768   8 relationship
+ 0.0406  10 sex
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{gain ratio selected attributes - adult\label{gain-adult}}
+\end{figure}
+
+
+The resulting clusters where not as distinguishable as those produced with PCA. Figure~\ref{parallel-gain-cluster} shows the resulting grouping after running EM clustering on the reduced dataset.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-gain-cluster.pdf}
+    \caption{gain-ratio clusters - adult\label{parallel-gain-cluster}}
+\end{figure} 
+
+%Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
 
 
 \subsection{Neural Network Training}

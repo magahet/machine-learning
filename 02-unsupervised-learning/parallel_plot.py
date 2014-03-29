@@ -8,5 +8,5 @@ from pandas.tools.plotting import parallel_coordinates
 
 data = read_csv(sys.argv[1])
 parallel_coordinates(data[:1000], 'cluster')
-#plt.xticks(rotation=45)
+plt.xticks(rotation=45)
 plt.show()
