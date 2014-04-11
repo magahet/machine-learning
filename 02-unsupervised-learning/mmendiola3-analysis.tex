@@ -28,6 +28,7 @@ Magahet Mendiola
 An empirical analysis of randomized optimization, clustering, and dimensionality reduction algorithms.
 \end{abstract}
 
+
 \section{Part 1: Randomized Optimization}
 
 In order to compare and contrast the given randomized optimization algorithms, a classification task was taken from the previous assignment and each algorithm was utilized to train a neural network to perform this task. Implementation of each algorithm as well as the code for running the neural network was taken from the ABAGAIL machine learning library (https://github.com/pushkar/ABAGAIL).
@@ -124,10 +125,6 @@ Our genetic algorithm converged very quickly toward an optimum set of weights. H
 \end{figure} 
 
 
-randomized hill climbing
-simulated annealing
-a genetic algorithm
-MIMIC
 
 %You will then use the first three algorithms to find good weights for a neural network. In particular, you will use them instead of backprop for the neural network you used in assignment #1 on at least one of the problems you created for assignment #1. Notice that weights in a neural network are continuous and real-valued instead of discrete so you might want to think a little bit about what it means to apply these sorts of algorithms in such a domain.
 
@@ -143,7 +140,7 @@ The second experiment was setup to evaluate how many fitness function evaluation
 
 Each algorithm was given the same set of parameters for each experiment. 
 
-Random hill climbing was setup to explore an input change of a single random bit and move in that direction if the fitness score improved. If an improved input was not found in a set number of evaluations (the number of input bits), the algorithm was restart with a new randomized input.
+Random hill climbing was setup to explore an input change of a single random bit and move in that direction if the fitness score improved. If an improved input was not found in a set number of evaluations (the number of input bits), the algorithm was restarted with a new randomized input.
 
 The temperature parameter for our simulated annealing algorithm was set at 1,000. This temperature was cooled by reducing it by 5\% each iteration. 
 
@@ -164,16 +161,17 @@ The count ones fitness function is well understood and easy to explain. The func
 
 Figure~\ref{over-time-count-ones} shows how our optimization algorithms performed against the count ones function with an 80 bit input. Random hill climbing appeared to discover peaks quickly. However, the global optimum was not reached in many cases until twice the number of evaluations as simulated annealing. RHC also suffered from it's random restart behavior, which caused many function evaluations at much lower values of the function.
 
-Simulated annealing was clearly the superior algorithm in this experiment. All 10 runs reached the global optimum within roughly 1,000 function evaluations, which represents 1/1\e{21} of the total input space. The genetic algorithm and MIMIC behaved well, making progress with each evaluation. However, they both required an order of magnitude greater evaluations to move toward the global optimum.
-
-Given the relatively smooth trend of the function toward a global optimum, simulated annealing seems to have been able to explore the space well enough to move in that direction. As we will see later, finding a suitable temperature parameter is crucial for allowing the algorithm to move out of local optima. However, high temperatures keep the optimization task geared towards exploration longer than is necessary. In the case of this experiment, we happen to stumble on a good balance between exploration and exploitation.
-
-
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{part1.2/count-ones-over-time.pdf}
     \caption{fitness score by iteration - count-ones\label{over-time-count-ones}}
 \end{figure} 
+
+Simulated annealing was clearly the superior algorithm in this experiment. All 10 runs reached the global optimum within roughly 1,000 function evaluations, which represents 1/1\e{21} of the total input space. The genetic algorithm and MIMIC behaved well, making progress with each evaluation. However, they both required an order of magnitude greater evaluations to move toward the global optimum.
+
+Given the relatively smooth trend of the function toward a global optimum, simulated annealing seems to have been able to explore the space well enough to move in that direction. As we will see later, finding a suitable temperature parameter is crucial for allowing the algorithm to move out of local optima. However, high temperatures keep the optimization task geared towards exploration longer than is necessary. In the case of this experiment, we happen to stumble on a good balance between exploration and exploitation.
+
+
 
 Each algorithm performed reasonably well at finding the global optimum for the count ones function at various input sizes, with the exception of our genetic algorithm. Given the somewhat unstructured and independent nature of the input bits, this is not surprising. MIMIC seemed to do well in this regard, despite the lack of structure. We could understand this to be a fortunate side effect of the probabilistic sampling, which causes the algorithm to perform similar to simulated annealing. Figure~\ref{max-count-ones} shows this behavior.
 
@@ -248,6 +246,9 @@ Each algorithm was able to find the one of the optima within a closer number of 
 %The first problem should highlight advantages of your genetic algorithm, the second of simulated annealing, and the third of MIMIC. Be creative and thoughtful. It is not required that the problems be complicated or painful. They can be simple. For example, the 4-peaks and k-color problems are rather straightforward, but illustrate relative strengths rather neatly.
 
 
+
+\clearpage
+
 \section{Part 2: Unsupervised Learning Algorithms}
 
 %You are to run a number of experiments. Come up with at least two datasets. If you'd like (and it makes a lot of sense in this case) you can use the ones you used in the first assignment or, if it makes any sense, the first part of this assignment.
@@ -274,7 +275,7 @@ The first dataset we will explore is the same as from Part 1, the Adult dataset 
 
 In order to determine the optimal value for K, we can iterate through increasing values and compare a metric that gives an idea of how well our data is segmented into each cluster. In this first case, the expectation maximization algorithm was run with increasing values of K, and the resulting log likelihood value was compared. This is a default option in the Weka implementation of the algorithm. Larger and smaller values of K were run to validate the result through visual inspection of the resulting cluster features. For the Adult dataset, a cluster size of three resulted in the greatest log likelihood, and the clusters made sense when viewing the resulting cluster attributes.
 
-Form the results of k-means (Figure~\ref{kmeans-summary}) and EM (Figure~\ref{kmeans-summary}) clustering, three distinct profiles emerge from the data:
+Form the results of k-means (Figure~\ref{kmeans-summary}) and EM (Figure~\ref{em-summary}) clustering, three distinct profiles emerge from the data:
 
 \paragraph{Cluster 1 - Young and poor}
 \begin{itemize}[itemsep=1pt]
@@ -344,14 +345,8 @@ class                   <=50K            >50K          <=50K          <=50K
 \end{figure}
 
 
-\scriptsize
+\tiny
 \begin{verbbox}
-EM
-==
-
-Number of clusters selected by cross validation: 3
-
-
                      Cluster
 Attribute                  0           1           2
                       (0.53)      (0.18)      (0.28)
@@ -372,17 +367,15 @@ relationship
    Unmarried        3189.2812    193.3051     66.4137
    Other-relative    899.9176     41.2378     42.8447
   [total]          17400.9445   5965.2944   9212.7611
+
 sex
    Male             7798.0266   5069.9658   8925.0076
    Female           9598.9179    891.3286    283.7535
   [total]          17396.9445   5961.2944   9208.7611
+
 capital-gain
   mean                  4.065   5506.3843     239.438
   std. dev.           60.7467  16515.2342    873.4603
-
-capital-loss
-  mean                      0    475.4836      0.9942
-  std. dev.          402.9602    837.7166     25.1187
 
 hours-per-week
   mean                37.5504     44.8544     43.0332
@@ -394,16 +387,6 @@ class
   [total]          17396.9445   5961.2944   9208.7611
 
 
-Time taken to build model (full training data) : 395.06 seconds
-
-=== Model and evaluation on training set ===
-
-Clustered Instances
-
-0      17815 ( 55%)
-1       4160 ( 13%)
-2      10586 ( 33%)
-
 Log likelihood: -46.47694
 \end{verbbox}
 \normalsize
@@ -414,7 +397,7 @@ Log likelihood: -46.47694
     \caption{subset of EM clustering results\label{em-summary}}
 \end{figure}
 
-Visualizing the samples based on their cluster assignments shows a somewhat clearer distinction than their class assignment plots. Figures~\ref{adult-attr-cluster}~and~\ref{adult-parallel-cluster} show these distributions. Figure~\ref{adult-parallel-cluster} provides a better picture of the groupings. We can see in this visualization how younger individuals cluster in their marital-status, relationship, capital gains, hours-per-week, and income class. Likewise, we see the profile pattern for the older, experienced, group (yellow). These individuals share the attributes of being older, having higher education levels, higher capital-gains, and more hours-per-week. It should be noted that although these grouping are clear enough to see upon examination, they do not stand out with complete distinctiveness. There is a significant amount of noise in the data, which many samples that do not conform the to complete set of common profile attributes.
+Visualizing the samples based on their cluster assignments shows a somewhat clearer distinction than their class assignment plots. Figures~\ref{adult-attr-cluster}~and~\ref{adult-parallel-cluster} show these distributions. Figure~\ref{adult-parallel-cluster} provides a better picture of the groupings. We can see in this visualization how younger individuals cluster in their marital-status, relationship, capital gains, hours-per-week, and income class. Likewise, we see the profile pattern for the older, experienced, group (yellow). These individuals share the attributes of being older, having higher education levels, higher capital-gains, and more hours-per-week. It should be noted that although these grouping are clear enough to see upon examination, they do not stand out with complete distinctiveness. There is a significant amount of noise in the data, with many samples that do not conform the to complete set of common profile attributes.
 
 \begin{figure}[!htbp]
     \centering
@@ -437,6 +420,7 @@ Visualizing the samples based on their cluster assignments shows a somewhat clea
 Running PCA on the Adult dataset results in features with the characteristics shown in Figure~\ref{pca-adult}. The first few principle components capture 11\% of the dataset variance. The distribution of eigenvalues shows that the roughly the first five components distinguish themselves in regards to their contribution to the overall variance.
 
 
+\scriptsize
 \begin{verbbox}
 eigenvalue  proportion  cumulative
 4.13178     0.03861     0.03861
@@ -455,20 +439,8 @@ eigenvalue  proportion  cumulative
 1.2507      0.01169     0.25753
 1.23304     0.01152     0.26906
 1.21991     0.0114      0.28046
-1.19888     0.0112      0.29166
-1.17351     0.01097     0.30263
-1.16087     0.01085     0.31348
-1.14374     0.01069     0.32417
-1.12887     0.01055     0.33472
-1.12004     0.01047     0.34519
-1.11544     0.01042     0.35561
-1.09716     0.01025     0.36586
-1.09448     0.01023     0.37609
-1.08928     0.01018     0.38627
-1.08335     0.01012     0.3964 
-1.07809     0.01008     0.40647
-1.06987     0.01        0.41647
 \end{verbbox}
+\normalsize
 
 \begin{figure}[!htbp]
     \centering
@@ -487,7 +459,7 @@ Clustering on the first five components from our resulting PCA features creates 
 
 \paragraph{ICA}
 
-Running independent component analysis on the dataset required a decision regarding the number of independent features to output. Without foreknowledge, experimentation was necessary to find an appropriate number of components. This was accomplished by iterating up to the original number of features, running ICA with that number of target components, and comparing the resulting kurtosis to determine how well ICA was able to pull independent features from the mixed uniform distribution. The intuition begin that a set of features with a high absolute biased kurtosis (zeroed at normal distribution), would indicate significant, independent, contributing features.
+Running independent component analysis on the dataset required a decision regarding the number of independent features to output. Without foreknowledge, experimentation was necessary to find an appropriate number of components. This was accomplished by iterating up to the original number of features, running ICA with that number of target components, and comparing the resulting kurtosis to determine how well ICA was able to pull independent features from the mixed uniform distribution. The intuition being that a set of features with a high absolute biased kurtosis (zeroed at normal distribution), would indicate significant, independent, contributing features.
 
 The result of this experiments can be seen in Figure~\ref{ica-stats-adult}. From this data we can make an informed decision regarding how many components to output from ICA for use in our clustering task. 
 
@@ -518,7 +490,7 @@ The result of this experiments can be seen in Figure~\ref{ica-stats-adult}. From
     \caption{ICA kurtosis stats by number of features - adult\label{ica-stats-adult}}
 \end{figure}
 
-Reducing to three components resulted in kurtosis of [6.2, 154.8, 20.3]. This signifies three, non-normally distributed, independent features. Performing EM and k-means clustering on the ICA filtered dataset resulted in a tight clusters (EM log likelihood: 23.5, k-means SSE: 270.4). Visualization of these clusters is shown in Figure~\ref{parallel-ica-cluster}. These show much more distinct groupings than with the original data. The EM clustering task took 12 seconds with these features, which is nearly half the time it required to process the original 14 features.
+Reducing to three components resulted in kurtosis of [6.2, 154.8, 20.3]. This signifies three, non-normally distributed, independent features. Performing EM and k-means clustering on the ICA filtered dataset resulted in compact clusters (EM log likelihood: 23.5, k-means SSE: 270.4). Visualization of these clusters is shown in Figure~\ref{parallel-ica-cluster}. These show much more distinct groupings than with the original data. The EM clustering task took 12 seconds with these features, which is nearly half the time required to process the original 14 features.
 
 \begin{figure}[!htbp]
     \centering
@@ -528,36 +500,33 @@ Reducing to three components resulted in kurtosis of [6.2, 154.8, 20.3]. This si
 
 \paragraph{RP}
 
-Creating random projections of the dataset onto five components resulted in mixed behavior. The distribution of values for resulting features had significantly random and differing profiles. Clustering results using those features varied both in cluster concentrations and distribution of instances into each distribution. Over five separate runs of random projection and EM clustering, we see log likelihood figures between 30 and 50. These concentrations range above and below those achieved using the original 14 attributes. Run times for each experiment also varied significantly, ranging from 15 to 40 seconds. To compare, the same clustering task took 22 seconds on the original data.
+Creating random projections of the dataset onto five components resulted in mixed behavior. The distribution of values for resulting features had significantly random and differing profiles. Clustering results using those features varied both in cluster concentrations and distribution of instances into each distribution. Over five separate runs of random projection and EM clustering, we see log likelihood figures between -50 and -20. These concentrations range above and below those achieved using the original 14 attributes. Run times for each experiment also varied significantly, ranging from 15 to 40 seconds. To compare, the same clustering task took 22 seconds on the original data.
 
-The main issue with the random projection clustering results are with the distribution of instances across the identified clusters. Figure~\ref{rp-custer-dist-adult} shows distributions for each experiment run as well as from clustering on the original attributes. The distributions for remote projection runs show significant deviation, which indicates that EM and k-means clustering identified quite different cluster centroids for each projected dataset.
+The main issue with the random projection clustering results are with the distribution of instances across the identified clusters. Figure~\ref{rp-custer-dist-adult} shows distributions for each experiment run as well as from clustering on the original attributes. The distributions for random projection runs show significant deviation, which indicates that EM and k-means clustering identified quite different cluster centroids for each projected dataset.
 
+\tiny
 \begin{verbbox}
 Cluster Distributions on Original Attributes
 
-Clustered Instances
 0      17815 ( 55%)
 1       4160 ( 13%)
 2      10586 ( 33%)
 
-
 Cluster Distributions on Random Projections
 
-Clustered Instances
 0       7515 ( 23%)
 1      20815 ( 64%)
 2       4231 ( 13%)
 
-Clustered Instances
 0       8684 ( 27%)
 1      16861 ( 52%)
 2       7016 ( 22%)
 
-Clustered Instances
 0       2226 (  7%)
 1       2005 (  6%)
 2      28330 ( 87%)
 \end{verbbox}
+\normalsize
 
 \begin{figure}[!htbp]
     \centering
@@ -566,24 +535,262 @@ Clustered Instances
 \end{figure}
 
 
+\paragraph{Information Gain Ratio}
 
+The final attribute selection algorithm tested was a filter based on attributes with the best information gain ratio. This showed positive results in reducing dimensions in classification tasks. For clustering, the attributes with the top five gain ratio values were used in the clustering task (Figure~\ref{gain-adult}).
+
+\scriptsize
+\begin{verbbox}
+Search Method:
+    Attribute ranking.
+
+Attribute Evaluator (supervised, Class (nominal): 15 class):
+    Gain Ratio feature evaluator
+
+Ranked attributes:
+ 0.1876  11 capital-gain
+ 0.1165  12 capital-loss
+ 0.0854   6 marital-status
+ 0.0768   8 relationship
+ 0.0406  10 sex
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{gain ratio selected attributes - adult\label{gain-adult}}
+\end{figure}
+
+
+The resulting clusters where not as distinguishable as those produced with PCA. Figure~\ref{parallel-gain-cluster} shows the resulting grouping after running EM clustering on the reduced dataset. However, the result was similar to that achieved using the full set of 14 attributes. This is a positive outcome, as the goal of feature selection is to reduce the dimensionality of the dataset without adversely affecting the clustering results. In this case, we were able to reduce the size of the dataset by 64\%.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/adult/parallel-gain-cluster.pdf}
+    \caption{gain-ratio clusters - adult\label{parallel-gain-cluster}}
+\end{figure} 
 
 %Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
 
-\subsection{Exploring Dataset 2: TODO}
+
+
+\subsection{Exploring Dataset 2: Iris}
+
+The second dataset we will explore is the Iris dataset from UCI. This is a very well studied dataset with a small sample size, which should help in understanding the effects of our clustering and dimensionality reduction algorithms. The distribution of instances by their class label is shown in Figure~\ref{iris-parallel-class}. Visually, we see two groupings based on petal length and width. However, the data is labeled with three classes (species). One of these classes matches perfectly with one of the natural groupings, while the other two fall clearly into the second group. This can also be seen in many of the attribute scatter plots (Figure~\ref{iris-attr-scatter}).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/parallel-class.pdf}
+    \caption{dataset parallel plot - iris\label{iris-parallel-class}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter.pdf}
+    \caption{attribute scatter plots - iris\label{iris-attr-scatter}}
+\end{figure} 
 
 \subsubsection{Clustering}
 
 %Run the clustering algorithms on the data sets and describe what you see.
 
-\subsubsection{Dimensionality Reduction}
+As with our first dataset, the EM clustering algorithm was run against the iris dataset with automatic determination of the number of clusters. According to this process, splitting the data into five clusters resulted in the lowest log likelihood value (-1.6). As we can see from Figure~\ref{iris-parallel-cluster-5}, these clusters distinguish themselves mostly on the petal length and width attributes. However, distance between instances on those features appears to be greatest with two clusters. Figure~\ref{iris-parallel-cluster-2} shows the same parallel plot with just two clusters. The log likelihood for this grouping was -3.
 
-%Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/parallel-cluster.pdf}
+    \caption{parallel plot with 5 clusters- iris\label{iris-parallel-cluster-5}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/parallel-cluster-2.pdf}
+    \caption{parallel plot with 2 clusters- iris\label{iris-parallel-cluster-2}}
+\end{figure} 
+
+In the case of five clusters, each species class is made up of two clusters, with one cluster split between two of the classes. In the case of two clusters, one cluster matches perfectly with one of the classes, while the other cluster instances are equally distributed between the two remaining classes.
+
+Looking at the attribute scatter plots for two and five cluster assignments (Figures~\ref{iris-attr-scatter-cluster-2}~and~\ref{iris-attr-scatter-cluster-5}, we see that the inter-cluster distance is far greater with two clusters than with five. However, the five cluster result does seem to have fairly good linear separability between each attribute pair plot.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter-cluster-2.pdf}
+    \caption{attribute scatter with 2 clusters- iris\label{iris-attr-scatter-cluster-2}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/attribute-scatter-cluster-5.pdf}
+    \caption{attribute scatter with 5 clusters- iris\label{iris-attr-scatter-cluster-5}}
+\end{figure} 
+
+Finally, we can see in Figure~\ref{radviz-iris} how the relationship between all four attributes affects each instance, and there is a clear separation between two clusters.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/radviz-iris.pdf}
+    \caption{radviz plot with 2 clusters- iris\label{radviz-iris}}
+\end{figure} 
+
+Figure~\ref{iris-k-means-centroids} shows the k-means centroids for two clusters and the min and max values for each of the attributes. We can see that the separation between centroids for each attribute is significant within the range. This indicates a large inter-cluster spacing.
+
+\tiny
+\begin{verbbox}
+Cluster centroids:
+                                          Cluster#
+Attribute                Full Data               0               1
+                             (150)           (100)            (50)
+==================================================================
+sepallength                 5.8433           6.262           5.006
+sepalwidth                   3.054           2.872           3.418
+petallength                 3.7587           4.906           1.464
+petalwidth                  1.1987           1.676           0.244
+class                  Iris-setosa Iris-versicolor     Iris-setosa
+
+Min and Max values:
+
+                      min            max
+========================================
+sepallength           4.3            7.9  
+sepalwidth              2            4.4
+petallength             1            6.9
+petalwidth            0.1            2.5
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{k-means clustering centroids\label{iris-k-means-centroids}}
+\end{figure}
+
+
+
 
 \subsubsection{Clustering on Dimensionally Reduced Dataset}
 
-%Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
+%Apply the dimensionality reduction algorithms to the two datasets and describe what you see.
 
+\paragraph{PCA}
+Running PCA on the Iris dataset resulted in two principle components. Eigenvalues for these are shown in Figure~\ref{pca-iris}. The first principle component captures 72\% of the dataset variance. The second captures 23\% of the variance. Together they account for 96\% of the variance, which makes this dimensionally reduction quite successful at capturing the dataset information with a 60\% reduction in size.
+
+
+\tiny
+\begin{verbbox}
+Correlation matrix
+  1     -0.11   0.87   0.82 
+ -0.11   1     -0.42  -0.36 
+  0.87  -0.42   1      0.96 
+  0.82  -0.36   0.96   1    
+
+
+eigenvalue  proportion  cumulative
+2.91082     0.7277      0.7277    componant01
+0.92122     0.23031     0.95801   componant02
+
+Eigenvectors
+ V1  V2 
+ 0.5224 -0.3723 sepallength
+-0.2634 -0.9256 sepalwidth
+ 0.5813 -0.0211 petallength
+ 0.5656 -0.0654 petalwidth
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{PCA eigenvalues - iris\label{pca-iris}}
+\end{figure}
+
+
+Clustering on these two components creates clusters with very clear distinctions, as we see in Figure~\ref{pca-cluster-scatter-iris}. Although the dataset could be partitioned into more clusters, the inter-cluster spacing seen here provides compelling evidence that two clusters describe the dataset quite well.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/pca-cluster-scatter.pdf}
+    \caption{pca scatter with 2 clusters - iris\label{pca-cluster-scatter-iris}}
+\end{figure} 
+
+
+\paragraph{ICA}
+
+Again we need to make a determination regarding the number of components to output when running ICA. With so few original attributes, we can examine the full set of kurtosis figures for each resulting set of components. These can be seen in Figure~\ref{ica-kurtosis-iris}.
+
+\begin{verbbox}
+kurtosis of ica components:
+1   [-1.37103944]
+2   [ 0.16586027, -1.41678426]
+3   [ 0.1915205 ,  0.05653964, -1.4256907 ]
+\end{verbbox}
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{ICA kurtosis by number of features - iris\label{ica-kurtosis-iris}}
+\end{figure}
+
+Reducing the dataset to two independent components results in a good balance between distinguishing independent attributes (measured by kurtosis) and reducing the dimensionality of the original dataset. The resulting projected data provides clearer cluster separation than achieved with either the original four attributes or the two attributes derived with PCA. Figure~\ref{ica-scatter-iris} shows this separability. EM clustering on the ICA components resulted in a log likelihood of 2.9, compared to -2.6 from the original data and -2.7 from the PCA features. In each case, the distribution of instances into the two clusters was identical. This indicates that clustering on the original and reduced datasets did not change the resulting clusters, but only the compactness of those clusters.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/ica-scatter.pdf}
+    \caption{ICA component scatter plot - iris\label{ica-scatter-iris}}
+\end{figure} 
+
+In the case of k-means clustering, sum of squared errors was essentially the same between PCA and ICA based clusters (6.4). Again, the cluster distributions for all three k-means derived results was the same.
+
+
+\paragraph{RP}
+
+Creating random projections to two features resulted in distributions with similar features as found with ICA and PCA. Although some poor projections removed information necessary to distinguish the separate clusters, in most iterations of the experiment the two resulting attributes were enough to clearly separate two distinct groupings. This can be seen in the four scatter plots in Figure~\ref{rp-scatter}. The main detractor from this method is the unpredictable expressiveness of the resulting projected data.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/rp.pdf}
+    \caption{RP component scatter plot - iris\label{rp-scatter}}
+\end{figure} 
+
+
+\paragraph{Information Gain Ratio}
+
+We first evaluated the information gain ratio on each of the original attributes (Figure~\ref{gain-iris}). The objective is to dimensionally reduce the dataset without affecting the accuracy of our clustering algorithms. From these rankings, none of the four attributes are obvious choices for filtering. However, with so few attributes we can simply repeat the clustering task and add each feature one at a time, noting the results after each evaluation. 
+
+\begin{verbbox}
+
+Attribute Evaluator (supervised, Class (nominal): 5 class):
+    Gain Ratio feature evaluator
+
+Ranked attributes:
+ 0.871  4 petalwidth
+ 0.734  3 petallength
+ 0.381  1 sepallength
+ 0.242  2 sepalwidth
+\end{verbbox}
+\normalsize
+
+\begin{figure}[!htbp]
+    \centering
+    \theverbbox
+    \caption{gain ratio selected attributes - iris\label{gain-iris}}
+\end{figure}
+
+
+With only a single attribute, petal width, EM was able to group all but two instances into the same two clusters as was done when using all four attributes. With petal width and petal length EM was able to create the exact clusters as it did with the full dataset. Figure~\ref{gain-scatter-iris} shows the resulting scatter plots with these sets of attributes.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{part2/iris/gain.pdf}
+    \caption{gain-ratio clusters by filtered attributes - iris\label{gain-scatter-iris}}
+\end{figure} 
+
+It is interesting to see that there are cases when simple attribute ranking and filtering can be very effective in reducing dimensionality without complex processing and with little to no impact on the clustering performance.
+
+%Reproduce your clustering experiments, but on the data after you've run dimensionality reduction on it.
 
 
 \subsection{Neural Network Training}
@@ -671,7 +878,7 @@ WAvg.    0.828     0.352      0.82      0.828     0.822      0.885
 
 \subsubsection{Training with Clusters as Features}
 
-Using the cluster labels found from running the EM algorithm, we see that these new features work well as inputs for our neural network. Figure~\ref{ann-cluster-weights} shows that only one of the original attributes contributed more to the classification task than membership in one of the three clusters. 
+Using the cluster labels found from running the EM clustering algorithm, we see these new features work well as inputs for our neural network. Figure~\ref{ann-cluster-weights} shows the resulting weights for each edge from an input node after the network was trained with back propagation and gradient decent. Only one of the original attribute input nodes contributed more to the classification task than membership in one of the three clusters. This shows the added information cluster membership provides as a new feature of the dataset. This new, expressive, feature allows the network to perform similar to one utilizing many more attributes.
 
 
 \scriptsize
@@ -718,6 +925,8 @@ Class  >50K
 \end{figure}
 
 With these new features, we were able to filter most of the remaining attributes without affecting the accuracy of the classifier. The neural network, trained on nine attributes including three for cluster membership, resulted in a weighted f-score of 0.824. The original dataset included 107 attributes (mainly due to nominal to binary filtering). That network resulted in an f-score of 8.38 and required 10 times as long to train.
+
+An interesting extension of this experiment would be to determine a way to process new instances (without cluster assignments) by first determining an appropriate cluster label, then activating the neural network to classify the sample. This would be a somewhat hybrid approach, as it would include both lazy (clustering) and eager (ANN) learning.
 
 
 %Apply the clustering algorithms to the same dataset to which you just applied the dimensionality reduction algorithms (you've probably already done this), treating the clusters as if they were new features. In other words, treat the clustering algorithms as if they were dimensionality reduction algorithms. Again, rerun your neural network learner on the newly projected data.
