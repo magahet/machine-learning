@@ -11,7 +11,6 @@
 #import mdp
 import util
 import random
-import sys
 
 from learningAgents import ValueEstimationAgent
 
@@ -25,7 +24,7 @@ class PolicyIterationAgent(ValueEstimationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
-    def __init__(self, mdp, discount=0.9, iterations=sys.maxint):
+    def __init__(self, mdp, discount=0.9, epsilon=0.01):
         """
           Your value iteration agent should take an mdp on
           construction, run the indicated number of iterations
@@ -40,38 +39,46 @@ class PolicyIterationAgent(ValueEstimationAgent):
         """
         self.mdp = mdp
         self.discount = discount
-        self.iterations = iterations
+        self.epsilon = epsilon
         self.values = util.Counter()  # A Counter is a dict with default 0
         self.pi = dict([(s, random.choice(mdp.getPossibleActions(s))) for s in mdp.getStates() if not mdp.isTerminal(s)])
+        self.iteration = 0
+        self.delta = 0.0
+        self.done = False
 
-        iteration = 0
-        while True:
-            iteration += 1
-            self.values = self.policyEvaluation(self.pi)
-            unchanged = True
-            for state in self.mdp.getStates():
-                action_values = util.Counter()
-                if self.mdp.isTerminal(state):
-                    continue
-                for action in self.mdp.getPossibleActions(state):
-                    action_values[action] = self.computeQValueFromValues(state, action)
-                a = action_values.argMax()
-                if a != self.pi[state]:
-                    self.pi[state] = a
-                    unchanged = False
-            if unchanged or iteration > iterations:
-                break
+    def iterate(self):
+        self.iteration += 1
+        self.values = self.policyEvaluation(self.pi)
+        unchanged = True
+        for state in self.mdp.getStates():
+            action_values = util.Counter()
+            if self.mdp.isTerminal(state):
+                continue
+            for action in self.mdp.getPossibleActions(state):
+                action_values[action] = self.computeQValueFromValues(state, action)
+            a = action_values.argMax()
+            if action_values[a] > self.values[state] + self.epsilon:
+                self.pi[state] = a
+                unchanged = False
+        if unchanged:
+            self.done = True
 
-    def policyEvaluation(self, pi, k=20):
+    def policyEvaluation(self, pi):
         """Return an updated utility mapping U from each state in the MDP to its
         utility, using an approximation (modified policy iteration)."""
         values = self.values.copy()
-        for i in range(k):
+        while True:
+            values_0 = values.copy()
             for state in self.mdp.getStates():
                 if self.mdp.isTerminal(state):
-                    self.mdp.getReward(state, None, None)
+                    values[state] = self.mdp.getReward(state, None, None)
                 else:
                     values[state] = self.computeQValueFromValues(state, pi[state])
+            self.delta = max([abs(values_0[k] - values[k]) for k in values.keys()])
+            #print values_0.values()
+            #print values.values()
+            if self.delta <= self.epsilon:
+                break
         return values
 
     def getValue(self, state):
@@ -91,34 +98,12 @@ class PolicyIterationAgent(ValueEstimationAgent):
                 q_value += prob * (self.mdp.getReward(state, action, next_state) + (self.discount * self.values[next_state]))
         return q_value
 
-    def computeActionFromValues(self, state):
-        """
-          The policy is the best action in the given state
-          according to the values currently stored in self.values.
-
-          You may break ties any way you see fit.  Note that if
-          there are no legal actions, which is the case at the
-          terminal state, you should return None.
-        """
-        if self.mdp.isTerminal(state):
-            return None
-        else:
-            all_actions = self.mdp.getPossibleActions(state)
-            best_action = None
-            maxqvalue = float("-inf")
-            for action in all_actions:
-                temp = self.getQValue(state, action)
-                if temp > maxqvalue:
-                    best_action = action
-                    maxqvalue = temp
-            return best_action
-
     def getPolicy(self, state):
-        return self.computeActionFromValues(state)
+        return self.pi[state] if not self.mdp.isTerminal(state) else None
 
     def getAction(self, state):
         "Returns the policy at the state (no exploration)."
-        return self.computeActionFromValues(state)
+        return self.pi[state] if not self.mdp.isTerminal(state) else None
 
     def getQValue(self, state, action):
         return self.computeQValueFromValues(state, action)

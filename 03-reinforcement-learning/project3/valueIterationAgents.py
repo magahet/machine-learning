@@ -23,7 +23,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
-    def __init__(self, mdp, discount=0.9, iterations=100):
+    def __init__(self, mdp, discount=0.9, epsilon=0.01):
         """
           Your value iteration agent should take an mdp on
           construction, run the indicated number of iterations
@@ -36,39 +36,26 @@ class ValueIterationAgent(ValueEstimationAgent):
               mdp.getReward(state, action, nextState)
               mdp.isTerminal(state)
         """
-        '''
         self.mdp = mdp
         self.discount = discount
-        self.iterations = iterations
-        self.values = util.Counter() # A Counter is a dict with default 0
-        new_values = util.Counter()
+        self.epsilon = epsilon
+        self.values = util.Counter()  # A Counter is a dict with default 0
+        self.iteration = 0
+        self.done = False
 
-
-        for iteration in range(self.iterations):
-          for state in self.mdp.getStates():
+    def iterate(self):
+        self.iteration += 1
+        vk_minus_one = self.values.copy()
+        for state in self.mdp.getStates():
             action_values = util.Counter()
             if not self.mdp.isTerminal(state):
-              for action in self.mdp.getPossibleActions(state):
-                for next_state, prob_state in self.mdp.getTransitionStatesAndProbs(state, action):
-                  action_values[action] += prob_state * (self.mdp.getReward(state, action, next_state) + (self.discount * self.getQValue(state, action)))
-              new_values[state] = action_values[action_values.argMax()]
-              self.values = new_values
-        '''
-        self.mdp = mdp
-        self.discount = discount
-        self.iterations = iterations
-        self.values = util.Counter()  # A Counter is a dict with default 0
-        action_values = util.Counter()
-
-        for iteration in range(self.iterations):
-            vk_minus_one = self.values.copy()
-            for state in self.mdp.getStates():
-                action_values = util.Counter()
-                if not self.mdp.isTerminal(state):
-                    for action in self.mdp.getPossibleActions(state):
-                        for next_state, prob_state in self.mdp.getTransitionStatesAndProbs(state, action):
-                            action_values[action] += prob_state * (self.mdp.getReward(state, action, next_state) + (self.discount * vk_minus_one[next_state]))
-                    self.values[state] = action_values[action_values.argMax()]
+                for action in self.mdp.getPossibleActions(state):
+                    for next_state, prob_state in self.mdp.getTransitionStatesAndProbs(state, action):
+                        action_values[action] += prob_state * (self.mdp.getReward(state, action, next_state) + (self.discount * vk_minus_one[next_state]))
+                self.values[state] = action_values[action_values.argMax()]
+        delta = max([abs(vk_minus_one[k] - self.values[k]) for k in self.values.keys()])
+        if delta <= self.epsilon:
+            self.done = True
 
     def getValue(self, state):
         """

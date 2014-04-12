@@ -4,7 +4,7 @@
 # project. You are free to use and extend these projects for educational
 # purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and Pieter 
+# Student side autograding was added by Brad Miller, Nick Hay, and Pieter
 # Abbeel in Spring 2013.
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
@@ -248,7 +248,7 @@ def drawSquare(x, y, val, min, max, valStr, action, isObstacle, isTerminal, isCu
         circle( (screen_x, screen_y), 0.1*GRID_SIZE, outlineColor=LOCATION_COLOR, fillColor=LOCATION_COLOR )
 
     if not isObstacle:
-        text( (screen_x, screen_y), text_color, valStr, "Courier", -30, "bold", "c")
+        text( (screen_x, screen_y), text_color, valStr, "Courier", GRID_SIZE // -5, "bold", "c")
 
 
 def drawSquareQ(x, y, qVals, minVal, maxVal, valStrs, bestActions, isCurrent):
@@ -300,7 +300,7 @@ def drawSquareQ(x, y, qVals, minVal, maxVal, valStrs, bestActions, isCurrent):
         valStr = ""
         if action in valStrs:
             valStr = valStrs[action]
-        h = -20
+        h = GRID_SIZE // -8
         if action == 'north':
             #polygon( (center, nw, ne), wedge_color, filled = 1, smooth = 0)
             text(n, text_color, valStr, "Courier", h, "bold", "n")

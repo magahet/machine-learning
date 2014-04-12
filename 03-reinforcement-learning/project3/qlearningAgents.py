@@ -4,7 +4,7 @@
 # project. You are free to use and extend these projects for educational
 # purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
 # John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and Pieter 
+# Student side autograding was added by Brad Miller, Nick Hay, and Pieter
 # Abbeel in Spring 2013.
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
@@ -12,7 +12,9 @@ from game import *
 from learningAgents import ReinforcementAgent
 from featureExtractors import *
 
-import random,util,math
+import random
+import util
+
 
 class QLearningAgent(ReinforcementAgent):
     """
@@ -47,8 +49,7 @@ class QLearningAgent(ReinforcementAgent):
           Should return 0.0 if we have never seen a state
           or the Q node value otherwise
         """
-        return self.qvalues[(state, action)] 
-
+        return self.qvalues[(state, action)]
 
     def computeValueFromQValues(self, state):
         """
@@ -60,12 +61,11 @@ class QLearningAgent(ReinforcementAgent):
         action_values = list()
         all_actions = self.getLegalActions(state)
         if all_actions:
-          for action in all_actions:
-            action_values.append(self.getQValue(state, action))
-          return max(action_values)
+            for action in all_actions:
+                action_values.append(self.getQValue(state, action))
+            return max(action_values)
         else:
-          return 0.0
-
+            return 0.0
 
     def computeActionFromQValues(self, state):
         """
@@ -76,14 +76,13 @@ class QLearningAgent(ReinforcementAgent):
         action_values = list()
         all_actions = self.getLegalActions(state)
         if all_actions:
-          for action in all_actions:
-            action_values.append(self.getQValue(state, action))
-          max_index = action_values.index(max(action_values))
-          return all_actions[max_index]
+            for action in all_actions:
+                action_values.append(self.getQValue(state, action))
+            max_index = random.choice(
+                [e for e, a in enumerate(action_values) if a == max(action_values)])
+            return all_actions[max_index]
         else:
-          return None
-
-        
+            return None
 
     def getAction(self, state):
         """
@@ -119,11 +118,12 @@ class QLearningAgent(ReinforcementAgent):
         """
 
         previous = reward + self.discount * self.getValue(nextState)
-        self.qvalues[(state, action)] = (1.0 - self.alpha) * self.qvalues[state, action] + self.alpha * previous
+        self.qvalues[(state, action)] = (1.0 - self.alpha) * \
+            self.qvalues[state, action] + self.alpha * previous
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
-        
+
     def getValue(self, state):
         return self.computeValueFromQValues(state)
 
@@ -131,7 +131,7 @@ class QLearningAgent(ReinforcementAgent):
 class PacmanQAgent(QLearningAgent):
     "Exactly the same as QLearningAgent, but with different default parameters"
 
-    def __init__(self, epsilon=0.05,gamma=0.8,alpha=0.2, numTraining=0, **args):
+    def __init__(self, epsilon=0.05, gamma=0.8, alpha=0.2, numTraining=0, **args):
         """
         These default parameters can be changed from the pacman.py command line.
         For example, to change the exploration rate, try:
@@ -155,8 +155,8 @@ class PacmanQAgent(QLearningAgent):
         informs parent of action for Pacman.  Do not change or remove this
         method.
         """
-        action = QLearningAgent.getAction(self,state)
-        self.doAction(state,action)
+        action = QLearningAgent.getAction(self, state)
+        self.doAction(state, action)
         return action
 
 
@@ -192,9 +192,11 @@ class ApproximateQAgent(PacmanQAgent):
            Should update your weights based on transition
         """
         feats = self.featExtractor.getFeatures(state, action)
-        difference = (reward + self.discount * self.getValue(nextState)) - self.getQValue(state, action)
+        difference = (reward + self.discount * self.getValue(
+            nextState)) - self.getQValue(state, action)
         for feat in feats:
-            self.weights[feat] = self.weights[feat] + self.alpha * difference * feats[feat]
+            self.weights[feat] = self.weights[feat] + \
+                self.alpha * difference * feats[feat]
 
     def final(self, state):
         "Called at the end of each game."

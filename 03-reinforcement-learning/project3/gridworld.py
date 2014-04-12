@@ -313,6 +313,34 @@ def getBookGrid():
     return Gridworld(grid)
 
 
+def getBigMazeGrid():
+    grid = [
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', +300, ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        ['#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#'],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        ['S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+    ]
+    return Gridworld(grid)
+
+
 def getMazeGrid():
     grid = [[' ', ' ', ' ', +1],
             ['#', '#', ' ', '#'],
@@ -413,11 +441,14 @@ def parseOptions():
     optParser.add_option('-e', '--epsilon', action='store',
                          type='float', dest='epsilon', default=0.3,
                          metavar="E", help='Chance of taking a random action in q-learning (default %default)')
+    optParser.add_option('-t', '--threshold', action='store',
+                         type='float', dest='threshold', default=0.01,
+                         metavar="T", help='Threshold of minimum value change to continue iterating (default %default)')
     optParser.add_option('-l', '--learningRate', action='store',
                          type='float', dest='learningRate', default=0.5,
                          metavar="P", help='TD learning rate (default %default)')
     optParser.add_option('-i', '--iterations', action='store',
-                         type='int', dest='iters', default=10,
+                         type='int', dest='iters',
                          metavar="K", help='Number of rounds of value iteration (default %default)')
     optParser.add_option('-k', '--episodes', action='store',
                          type='int', dest='episodes', default=1,
@@ -431,7 +462,7 @@ def parseOptions():
     optParser.add_option('-a', '--agent', action='store', metavar="A",
                          type='string', dest='agent', default="random",
                          help='Agent type (options are \'random\', \'value\', \'policy\', and \'q\', default %default)')
-    optParser.add_option('-t', '--text', action='store_true',
+    optParser.add_option('-c', '--cli', action='store_true',
                          dest='textDisplay', default=False,
                          help='Use text-only ASCII display')
     optParser.add_option('-p', '--pause', action='store_true',
@@ -509,11 +540,11 @@ if __name__ == '__main__':
     if opts.agent == 'value':
         agentClass = valueIterationAgents.ValueIterationAgent
         a = valueIterationAgents.ValueIterationAgent(
-            mdp, opts.discount)
+            mdp, opts.discount, opts.threshold)
     elif opts.agent == 'policy':
         agentClass = policyIterationAgents.PolicyIterationAgent
         a = policyIterationAgents.PolicyIterationAgent(
-            mdp, opts.discount, opts.iters)
+            mdp, opts.discount, opts.threshold)
     elif opts.agent == 'q':
         #env.getPossibleActions, opts.discount, opts.learningRate, opts.epsilon
         #simulationFn = lambda agent, state: simulation.GridworldSimulation(agent,state,mdp)
@@ -555,43 +586,20 @@ if __name__ == '__main__':
     ###########################
     # DISPLAY Q/V VALUES BEFORE SIMULATION OF EPISODES
     try:
-        if not opts.manual and opts.agent == 'value':
-            if opts.valueSteps:
-                for i in range(opts.iters):
-                    tempAgent = agentClass(
-                        mdp, opts.discount, i)
-                    display.displayValues(tempAgent, message="VALUES AFTER " +
-                                          str(i) + " ITERATIONS")
+        if not opts.manual and opts.agent in ['value', 'policy']:
+            while not a.done:
+                a.iterate()
+                if opts.valueSteps:
+                    display.displayValues(a, message="VALUES AFTER " +
+                                          str(a.iteration) + " ITERATIONS")
                     display.pause()
-
             display.displayValues(a, message="VALUES AFTER " +
-                                  str(opts.iters) + " ITERATIONS")
+                                  str(a.iteration) + " ITERATIONS")
             display.pause()
             display.displayQValues(a, message="Q-VALUES AFTER " +
-                                   str(opts.iters) + " ITERATIONS")
+                                   str(a.iteration) + " ITERATIONS")
             display.pause()
-        elif not opts.manual and opts.agent == 'policy':
-            if opts.valueSteps:
-                tempAgent = agentClass(
-                    mdp, opts.discount)
-                final_pi = tuple(tempAgent.pi.values())
-                i = 0
-                while True:
-                    i += 1
-                    tempAgent = agentClass(
-                        mdp, opts.discount, i)
-                    display.displayValues(tempAgent, message="VALUES AFTER " +
-                                          str(i) + " ITERATIONS")
-                    display.pause()
-                    if final_pi == tuple(tempAgent.pi.values()):
-                        break
-
-            display.displayValues(a, message="VALUES AFTER " +
-                                  str(opts.iters) + " ITERATIONS")
-            display.pause()
-            display.displayQValues(a, message="Q-VALUES AFTER " +
-                                   str(opts.iters) + " ITERATIONS")
-            display.pause()
+            sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(0)
 
