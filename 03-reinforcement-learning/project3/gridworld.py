@@ -377,8 +377,33 @@ def getQGrid():
     return Gridworld(grid)
 
 
-def getTunnelGrid():
-    grid = [['S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', +10]]
+def getTunnelSideGrid():
+    grid = [
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', +10, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+    ]
+    return Gridworld(grid)
+
+
+def getSideGrid():
+    grid = [
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', +10, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+    ]
+    return Gridworld(grid)
+
+
+def getRandomGrid(x=15, y=15, p=3, n=3, o=50):
+    grid = [[' ' for xx in range(x)] for yy in range(y)]
+    for i in range(o):
+        grid[random.randrange(x)][random.randrange(y)] = '#'
+    for i in range(n):
+        grid[random.randrange(x)][random.randrange(y)] = - (x + y)
+    for i in range(p):
+        grid[random.randrange(x)][random.randrange(y)] = x + y
+    grid[random.randrange(x)][random.randrange(y)] = 'S'
     return Gridworld(grid)
 
 
@@ -686,7 +711,8 @@ if __name__ == '__main__':
     if opts.agent == 'q':
         i = 0
         steps = 0
-        while len(set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])) > 2:
+        #while len(set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])) > 2:
+        while a.getValue(mdp.getStartState()) == 0.0:
             #print set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])
             i += 1
             steps += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, lambda x: None, pauseCallback)

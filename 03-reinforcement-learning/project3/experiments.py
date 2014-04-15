@@ -4,7 +4,7 @@
 import gridworld
 import valueIterationAgents
 import policyIterationAgents
-import qlearningAgents
+#import qlearningAgents
 import time
 import matplotlib.pyplot as plt
 
@@ -12,15 +12,23 @@ import matplotlib.pyplot as plt
 discount = 0.9
 threshold = 0.01
 
-f, ax = plt.subplots(2, sharex=True)
+#f, ax = plt.subplots(2, sharex=True)
+f, ax = plt.subplots()
 
 vtimes = []
 ptimes = []
 viters = []
 piters = []
 
-r = range(3, 31)
+
+def hd(a, b):
+    return sum([1 for k in a.keys() if a[k] != b[k]])
+
+
+#r = range(3, 31)
+r = [30]
 for size in r:
+    print size
     g = [[' ' for i in range(size)] for j in range(size)]
     g[0][0] = 'S'
     g[size - 1][size - 1] = size
@@ -31,53 +39,105 @@ for size in r:
     env = gridworld.GridworldEnvironment(mdp)
 
     v = valueIterationAgents.ValueIterationAgent(mdp, discount, threshold)
-    p = policyIterationAgents.PolicyIterationAgent(mdp, discount, threshold)
-
-    gridWorldEnv = gridworld.GridworldEnvironment(mdp)
-    actionFn = lambda state: mdp.getPossibleActions(state)
-    q = qlearningAgents.QLearningAgent(
-        alpha=0.5, epsilon=0.3, actionFn=actionFn)
-
-    start = time.time()
     while not v.done:
         v.iterate()
-    vtimes.append(time.time() - start)
-    viters.append(v.iteration)
+    optimal_v = {s: v.getPolicy(s) for s in mdp.getStates()}
 
-    start = time.time()
+    p = policyIterationAgents.PolicyIterationAgent(mdp, discount, threshold)
     while not p.done:
         p.iterate()
-    #print 'policy', '{0:.3f}'.format(time.time() - start), p.iteration
-    ptimes.append(time.time() - start)
-    piters.append(p.iteration)
+    optimal_p = {s: p.getPolicy(s) for s in mdp.getStates()}
 
-ax[0].plot(r, vtimes, label='value')
-ax[0].plot(r, ptimes, label='policy')
-handles, labels = ax[0].get_legend_handles_labels()
-ax[0].legend(handles, labels, loc=2)
+    #gridWorldEnv = gridworld.GridworldEnvironment(mdp)
+    #actionFn = lambda state: mdp.getPossibleActions(state)
+    #q = qlearningAgents.QLearningAgent(
+        #alpha=0.5, epsilon=0.3, actionFn=actionFn)
 
+    p = policyIterationAgents.PolicyIterationAgent(mdp, discount, threshold)
+    r_p = []
+    t = 0.0
+    while not p.done:
+        start = time.time()
+        p.iterate()
+        t += time.time() - start
+        r_p.append((t, p.iteration, hd(p.pi, optimal_p)))
 
-ax[1].plot(r, viters, label='value')
-ax[1].plot(r, piters, label='policy')
-handles, labels = ax[1].get_legend_handles_labels()
-ax[1].legend(handles, labels, loc=2)
-
-ax[0].set_title('time')
-ax[1].set_title('iterations')
-
-f.text(0.5, 0.95, 'planning performance', ha='center', va='center')
-f.text(0.5, 0.04, 'grid size (n x n)', ha='center', va='center')
-f.text(
-    0.06, 0.5, 'fitness score', ha='center', va='center', rotation='vertical')
-f.show()
+    v = valueIterationAgents.ValueIterationAgent(mdp, discount, threshold)
+    r_v = []
+    t = 0.0
+    while not v.done:
+        start = time.time()
+        v.iterate()
+        t += time.time() - start
+        r_v.append((t, v.iteration, hd({s: v.getPolicy(s) for s in mdp.getStates()}, optimal_v)))
 
     #i = 0
     #steps = 0
+    #hd = 1
     #start = time.time()
-    #while True
+    #while hd > 0:
         #i += 1
         #steps += gridworld.runEpisode(q, env, discount, q.getAction, lambda x: None, lambda x: None, lambda: None)
-    #print time.time() - start, i, steps
+        ##hd = sum([1 for s in mdp.getStates() if v.getPolicy(s) != q.computeActionFromQValues(s) and not mdp.isTerminal(s)])
+        #vp = {s: v.getPolicy(s) for s in mdp.getStates()}
+        #qp = {s: q.getPolicy(s) for s in mdp.getStates()}
+        #deltas = [(vp[s], qp[s]) for s in vp.keys() if vp[s] != qp[s]]
+        #print deltas
+        #print time.time() - start, i, steps, hd
+        #if not deltas:
+            #break
+
+    #start = time.time()
+    #while not p.done:
+        #p.iterate()
+    ##print 'policy', '{0:.3f}'.format(time.time() - start), p.iteration
+    #ptimes.append(time.time() - start)
+
+    #v = valueIterationAgents.ValueIterationAgent(mdp, discount, threshold)
+    #start = time.time()
+    #while not v.done:
+        #v.iterate()
+    #vtimes.append(time.time() - start)
+    #viters.append(v.iteration)
+
+    #p = policyIterationAgents.PolicyIterationAgent(mdp, discount, threshold)
+    #start = time.time()
+    #while not p.done:
+        #p.iterate()
+    #ptimes.append(time.time() - start)
+    #piters.append(p.iteration)
+
+
+ax.plot([t[0] for t in r_v], [t[2] for t in r_v], label='value')
+ax.plot([t[0] for t in r_p], [t[2] for t in r_p], label='policy')
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, loc=2)
+ax.set_ylabel('hamming distance')
+ax.set_xlabel('time (sec)')
+ax.set_title('hamming distance over time (30x30 grid)')
+f.show()
+
+
+#ax[0].plot(r, vtimes, label='value')
+#ax[0].plot(r, ptimes, label='policy')
+#handles, labels = ax[0].get_legend_handles_labels()
+#ax[0].legend(handles, labels, loc=2)
+
+
+#ax[1].plot(r, viters, label='value')
+#ax[1].plot(r, piters, label='policy')
+#handles, labels = ax[1].get_legend_handles_labels()
+#ax[1].legend(handles, labels, loc=2)
+
+#ax[0].set_ylabel('time')
+#ax[1].set_ylabel('iterations')
+
+#f.text(0.5, 0.95, 'planning performance', ha='center', va='center')
+#f.text(0.5, 0.04, 'grid size (n x n)', ha='center', va='center')
+##f.text(
+    ##0.06, 0.5, 'fitness score', ha='center', va='center', rotation='vertical')
+#f.show()
+
 
 
 

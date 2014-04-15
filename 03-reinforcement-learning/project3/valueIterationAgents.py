@@ -100,6 +100,9 @@ class ValueIterationAgent(ValueEstimationAgent):
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
 
+    def getPolicySet(self):
+        return {s: self.getAction(s) for s in self.mdp.getStates()}
+
     def getAction(self, state):
         "Returns the policy at the state (no exploration)."
         return self.computeActionFromValues(state)

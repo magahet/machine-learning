@@ -104,6 +104,9 @@ class PolicyIterationAgent(ValueEstimationAgent):
     def getPolicy(self, state):
         return self.pi[state] if not self.mdp.isTerminal(state) else None
 
+    def getPolicySet(self):
+        return self.pi
+
     def getAction(self, state):
         "Returns the policy at the state (no exploration)."
         return self.pi[state] if not self.mdp.isTerminal(state) else None
