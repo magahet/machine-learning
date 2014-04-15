@@ -82,9 +82,10 @@ Policies are not only affected by planning algorithm parameters, but also by the
     \caption{discount grid - various unintentional movement probabilities}
 \end{figure} 
 
+
 \subsection{Tunnel Grid}
 
-Tunnel grid is a one dimensional grid with the starting state on one end and the only terminal state on the other. Although this grid is simplistic, it highlights the distinctions between our planning and learning algorithms well. For example, Figure~\ref{tunnel-performance} shows the elapsed time and the number of iterations/episodes each algorithm took to converge. In the case of Q-learning, an episode is determined as a single training run from the starting state until the agent reaches a terminal state.
+Tunnel grid is a one dimensional grid with the starting state on one end and the only terminal state on the other. Although this grid is simplistic, it highlights the distinctions between our planning and learning algorithms well.
 
 \begin{figure}[!htbp]
     \centering
@@ -94,16 +95,39 @@ Tunnel grid is a one dimensional grid with the starting state on one end and the
     \caption{tunnel grid}
 \end{figure} 
 
+For example, Figure~\ref{tunnel-performance} shows the elapsed time and the number of iterations/episodes each algorithm took to converge. In the case of Q-learning, an episode is determined as a single training run from the starting state until the agent reaches a terminal state. Also, convergence for the Q-learning agent is defined as the state when setting $\epsilon$ to zero and following the best q-score at each state would result in the optimal policy.
 
-    \begin{table}[h]
-    \begin{tabular}{lllll}
-               & Elapsed Time & Iterations/Episodes &  &  \\
-    Value      & 0.04         & 29                  &  &  \\
-    Policy     & 0.04         & 19                  &  &  \\
-    Q-Learning & 0.390        & 18                  &  & 
-    \end{tabular}
-    \caption{tunnel grid - performance\label{tunnel-performance}}
-    \end{table}
+
+
+\begin{table}[!htbp]
+\begin{tabular}{lllll}
+           & Elapsed Time & Iterations/Episodes &  &  \\
+Value      & 0.04         & 29                  &  &  \\
+Policy     & 0.04         & 19                  &  &  \\
+Q-Learning & 0.390        & 18                  &  & 
+\end{tabular}
+\caption{tunnel grid - performance\label{tunnel-performance}}
+\end{table}
+
+We see from the first two rows that value iteration requires nearly 50\% more training cycles to converge. However, policy iteration and value iteration are identical in terms of elapsed time. This is due to the greater computational requirements of policy evaluation at each interval for policy iteration. Q-learning required a substantially longer amount of time to train.
+
+In the case of the tunnel grid, Q-learning will perform identically to an agent that guesses randomly (random walk) until it eventual reaches a non-zero reward state. Until then, none of the states it visits will produce a meaningful Q-value. This is highly inefficient, as the expected number of states the agent will visit before reaching the end is $n^2 + n$, which is 280 in a 19 state tunnel grid. A more intelligent agent would keep track of previously visited states that resulted in all zero q-scores and place greater action probability on moving to previously unexplored states.
+
+
+
+
+\subsection{Simple Grid}
+
+To evaluate value and policy iteration performance empirically as the number of states increase, each algorithm was run to convergence on grids ranging from 3 by 3 (9 states) to 30 by 30 (900 states). A single, positive valued, terminal state was set at one corner. Figure~/ref{planning-performance} shows the results of this experiment. Within these grid sizes, iterations seem to grow linearly with respect to the grid edge size, which seems reasonable considering the radiating propagation behavior seen with these algorithms. Elapsed time for each shows greater than linear growth, which can be partially attributed to the polynomial growth of the number of states. Relatively, policy iteration elapsed time seems to grow at a greater rate than value iteration. At 900 states, the difference is as great as 40\% slower.
+
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/planning-performance.pdf}
+    \caption{planning performance by grid size \label{planning-performance}}
+\end{figure} 
+
+
 
 \section{Value Iteration}
 
