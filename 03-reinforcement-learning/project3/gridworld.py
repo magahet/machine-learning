@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 # gridworld.py
 # ------------
 # Licensing Information: Please do not distribute or publish solutions to this
@@ -14,6 +17,7 @@ import mdp
 import environment
 import util
 import optparse
+import time
 
 
 class Gridworld(mdp.MarkovDecisionProcess):
@@ -350,6 +354,34 @@ def getMazeGrid():
     return Gridworld(grid)
 
 
+def getQGrid():
+    grid = [[' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            ['S', ' ', ' ', +1],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ']]
+    return Gridworld(grid)
+
+
+def getTunnelGrid():
+    grid = [['S', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', +10]]
+    return Gridworld(grid)
+
+
 def getUserAction(state, actionFunction):
     """
     Get an action from the user (rather than the agent).
@@ -383,14 +415,16 @@ def printString(x):
     print x
 
 
-def runEpisode(agent, environment, discount, decision, display, message, pause, episode):
+def runEpisode(agent, environment, discount, decision, display, message, pause, episode=0):
     returns = 0
     totalDiscount = 1.0
+    steps = 0
     environment.reset()
     if 'startEpisode' in dir(agent):
         agent.startEpisode()
     message("BEGINNING EPISODE: " + str(episode) + "\n")
     while True:
+        steps += 1
 
         # DISPLAY CURRENT STATE
         state = environment.getCurrentState()
@@ -402,7 +436,9 @@ def runEpisode(agent, environment, discount, decision, display, message, pause, 
         if len(actions) == 0:
             message("EPISODE " + str(
                 episode) + " COMPLETE: RETURN WAS " + str(returns) + "\n")
-            return returns
+            #print 'steps:', steps
+            #return returns
+            return steps
 
         # GET ACTION (USUALLY FROM AGENT)
         action = decision(state)
@@ -457,7 +493,7 @@ def parseOptions():
                          metavar="G", type='string', dest='grid', default="BookGrid",
                          help='Grid to use (case sensitive; options are BookGrid, BridgeGrid, CliffGrid, MazeGrid, default %default)')
     optParser.add_option(
-        '-w', '--windowSize', metavar="X", type='int', dest='gridSize', default=150,
+        '-w', '--windowSize', metavar="X", type='int', dest='gridSize', default=100,
         help='Request a window width of X pixels *per grid cell* (default %default)')
     optParser.add_option('-a', '--agent', action='store', metavar="A",
                          type='string', dest='agent', default="random",
@@ -520,6 +556,7 @@ if __name__ == '__main__':
     ###########################
     import textGridworldDisplay
     display = textGridworldDisplay.TextGridworldDisplay(mdp)
+    #if not opts.textDisplay and not opts.quiet:
     if not opts.textDisplay:
         import graphicsGridworldDisplay
         display = graphicsGridworldDisplay.GraphicsGridworldDisplay(
@@ -585,14 +622,17 @@ if __name__ == '__main__':
     # RUN EPISODES
     ###########################
     # DISPLAY Q/V VALUES BEFORE SIMULATION OF EPISODES
+    start_time = time.time()
+
     try:
-        if not opts.manual and opts.agent in ['value', 'policy']:
+        if not opts.quiet and not opts.manual and opts.agent in ['value', 'policy']:
             while not a.done:
                 a.iterate()
                 if opts.valueSteps:
                     display.displayValues(a, message="VALUES AFTER " +
                                           str(a.iteration) + " ITERATIONS")
                     display.pause()
+            print 'time:', time.time() - start_time
             display.displayValues(a, message="VALUES AFTER " +
                                   str(a.iteration) + " ITERATIONS")
             display.pause()
@@ -600,6 +640,11 @@ if __name__ == '__main__':
                                    str(a.iteration) + " ITERATIONS")
             display.pause()
             sys.exit(0)
+        elif opts.quiet and not opts.manual and opts.agent in ['value', 'policy']:
+            while not a.done:
+                a.iterate()
+            print 'time:', time.time() - start_time
+
     except KeyboardInterrupt:
         sys.exit(0)
 
@@ -638,28 +683,51 @@ if __name__ == '__main__':
     else:
         decisionCallback = a.getAction
 
-    # RUN EPISODES
-    if opts.episodes > 0:
-        print
-        print "RUNNING", opts.episodes, "EPISODES"
-        print
-    returns = 0
-    for episode in range(1, opts.episodes + 1):
-        returns += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, messageCallback, pauseCallback, episode)
-    if opts.episodes > 0:
-        print
-        print "AVERAGE RETURNS FROM START STATE: " + str((returns + 0.0) / opts.episodes)
-        print
-        print
-
-    # DISPLAY POST-LEARNING VALUES / Q-VALUES
-    if opts.agent == 'q' and not opts.manual:
+    if opts.agent == 'q':
+        i = 0
+        steps = 0
+        while len(set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])) > 2:
+            #print set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])
+            i += 1
+            steps += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, lambda x: None, pauseCallback)
+        print 'time:', time.time() - start_time
+        print 'steps:', steps
+        #print [(s, a.getAction(s)) for s in mdp.getStates() if not mdp.isTerminal(s)]
         try:
             display.displayQValues(a, message="Q-VALUES AFTER " +
-                                   str(opts.episodes) + " EPISODES")
+                                   str(i) + " EPISODES")
             display.pause()
             display.displayValues(a, message="VALUES AFTER " +
-                                  str(opts.episodes) + " EPISODES")
+                                  str(i) + " EPISODES")
             display.pause()
         except KeyboardInterrupt:
             sys.exit(0)
+
+
+
+    # RUN EPISODES
+    #if opts.episodes > 0:
+        #print
+        #print "RUNNING", opts.episodes, "EPISODES"
+        #print
+    #returns = 0
+    #for episode in range(1, opts.episodes + 1):
+        #returns += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, messageCallback, pauseCallback, episode)
+    #if opts.episodes > 0:
+        #print
+        #print "AVERAGE RETURNS FROM START STATE: " + str((returns + 0.0) / opts.episodes)
+        #print
+        #print
+
+
+    ## DISPLAY POST-LEARNING VALUES / Q-VALUES
+    #if opts.agent == 'q' and not opts.manual:
+        #try:
+            #display.displayQValues(a, message="Q-VALUES AFTER " +
+                                   #str(opts.episodes) + " EPISODES")
+            #display.pause()
+            #display.displayValues(a, message="VALUES AFTER " +
+                                  #str(opts.episodes) + " EPISODES")
+            #display.pause()
+        #except KeyboardInterrupt:
+            #sys.exit(0)

@@ -50,6 +50,7 @@ class PolicyIterationAgent(ValueEstimationAgent):
         self.iteration += 1
         self.values = self.policyEvaluation(self.pi)
         unchanged = True
+        #print self.iteration
         for state in self.mdp.getStates():
             action_values = util.Counter()
             if self.mdp.isTerminal(state):
@@ -57,7 +58,9 @@ class PolicyIterationAgent(ValueEstimationAgent):
             for action in self.mdp.getPossibleActions(state):
                 action_values[action] = self.computeQValueFromValues(state, action)
             a = action_values.argMax()
-            if action_values[a] > self.values[state] + self.epsilon:
+            #if action_values[a] > self.values[state] + self.epsilon:
+            #if a != self.pi[state]:
+            if a != self.pi[state] and self.values[state] == self.mdp.livingReward:
                 self.pi[state] = a
                 unchanged = False
         if unchanged:
