@@ -407,6 +407,21 @@ def getRandomGrid(x=15, y=15, p=3, n=3, o=50):
     return Gridworld(grid)
 
 
+def getSimpleGrid(size=10):
+    g = [[' ' for i in range(size)] for j in range(size)]
+    g[0][0] = 'S'
+    g[size - 1][size - 1] = (size ** 2) // 10
+    return Gridworld(g)
+
+
+def getTrapGrid(size=10):
+    g = [[' ' for i in range(size)] for j in range(size)]
+    g[0][0] = 'S'
+    g[size - 1][size - 1] = (size ** 2)
+    g[(size - 1) // 2][(size - 1) // 2] = (size ** 2) // 20
+    return Gridworld(g)
+
+
 def getUserAction(state, actionFunction):
     """
     Get an action from the user (rather than the agent).
@@ -442,6 +457,7 @@ def printString(x):
 
 def runEpisode(agent, environment, discount, decision, display, message, pause, episode=0):
     returns = 0
+    returns_list = []
     totalDiscount = 1.0
     steps = 0
     environment.reset()
@@ -462,7 +478,7 @@ def runEpisode(agent, environment, discount, decision, display, message, pause, 
             message("EPISODE " + str(
                 episode) + " COMPLETE: RETURN WAS " + str(returns) + "\n")
             #print 'steps:', steps
-            #return returns
+            #return returns_list
             return steps
 
         # GET ACTION (USUALLY FROM AGENT)
@@ -482,6 +498,7 @@ def runEpisode(agent, environment, discount, decision, display, message, pause, 
 
         returns += reward * totalDiscount
         totalDiscount *= discount
+        returns_list.append(returns)
 
     if 'stopEpisode' in dir(agent):
         agent.stopEpisode()
@@ -712,12 +729,15 @@ if __name__ == '__main__':
         i = 0
         steps = 0
         #while len(set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])) > 2:
-        while a.getValue(mdp.getStartState()) == 0.0:
-            #print set([a.computeActionFromQValues(s) for s in mdp.getStates() if not mdp.isTerminal(s)])
-            i += 1
-            steps += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, lambda x: None, pauseCallback)
-        print 'time:', time.time() - start_time
-        print 'steps:', steps
+        try:
+            while True:
+                i += 1
+                steps += runEpisode(a, env, opts.discount, decisionCallback, displayCallback, lambda x: None, pauseCallback)
+                print a.getValue(mdp.getStartState())
+            print 'time:', time.time() - start_time
+            print 'steps:', steps
+        except KeyboardInterrupt:
+            pass
         #print [(s, a.getAction(s)) for s in mdp.getStates() if not mdp.isTerminal(s)]
         try:
             display.displayQValues(a, message="Q-VALUES AFTER " +

@@ -144,6 +144,38 @@ Hamming distance over time is shown in Figure~\ref{simple-hd}. This plot shows h
     \caption{algorithm convergence over time \label{simple-hd}}
 \end{figure} 
 
+For our reinforcement learning agent, this simple grid provides an opportunity to explore the effects of various $\alpha$ (learning rate) and $\epsilon$ (exploration rate) settings.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/simple/q-alpha.pdf}
+    \caption{cumulative rewards over time (various $\alpha$) \label{simple-q-alpha}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/simple/q-epsilon.pdf}
+    \caption{cumulative rewards over time (various $\epsilon$) \label{simple-q-epsilon}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/trap/q-epsilon.pdf}
+    \caption{cumulative rewards over time - trap grid (various $\epsilon$) \label{trap-q-epsilon}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/trap/e02.pdf}
+    \caption{trap grid - 0.2 $\epsilon$) \label{trap-e02}}
+\end{figure} 
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=3in]{images/trap/e08.pdf}
+    \caption{trap grid - 0.8 $\epsilon$) \label{trap-e08}}
+\end{figure} 
+
 
 \subsection{Random Grid}
 
