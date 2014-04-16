@@ -93,7 +93,7 @@ Tunnel grid is a one dimensional grid with the starting state on one end and the
     \caption{tunnel grid}
 \end{figure} 
 
-For example, Figure~\ref{tunnel-performance} shows the elapsed time and the number of iterations/episodes each algorithm took to converge. In the case of Q-learning, an episode is determined as a single training run from the starting state until the agent reaches a terminal state. Also, convergence for the Q-learning agent is defined as the state when setting $\epsilon$ to zero and following the best q-score at each state would result in the optimal policy.
+For example, Table~\ref{tunnel-performance} shows the elapsed time and the number of iterations/episodes each algorithm took to converge. In the case of Q-learning, an episode is determined as a single training run from the starting state until the agent reaches a terminal state. Also, convergence for the Q-learning agent is defined as the state when setting $\epsilon$ to zero and following the best q-score at each state would result in the optimal policy.
 
 
 \begin{table}[!htbp]
@@ -106,9 +106,9 @@ Q-Learning & 0.390        & 18                  &  &
 \caption{tunnel grid - performance\label{tunnel-performance}}
 \end{table}
 
-We see from the first two rows that value iteration requires nearly 50\% more training cycles to converge. However, policy iteration and value iteration are identical in terms of elapsed time. This is due to the greater computational requirements of policy evaluation at each interval for policy iteration. Q-learning required a substantially longer amount of time to train.
+We see from the first two rows that value iteration requires nearly 50\% more training cycles to converge. However, policy iteration and value iteration are identical in terms of elapsed time. This is due to the greater computational requirements of policy evaluation at each interval. Q-learning required a substantially longer amount of time to train.
 
-In the case of the tunnel grid, Q-learning will perform identically to an agent that guesses randomly (random walk) until it eventual reaches a non-zero reward state. Until then, none of the states it visits will produce a meaningful Q-value. This is highly inefficient, as the expected number of states the agent will visit before reaching the end is $n^2 + n$ with n being the number of states between the start and terminal point. Once this state is eventually reached, the Q-values will be updated only for that state. The agent would have to return to that state again for the Q-value to propagate further. In total, the expected number of steps the agent would have to move before a full path is created in this MDP is the summation of expected values from 1 to n random walks. In a 19 state tunnel grid world, that comes out to around 3,000 expected steps before a full path of q-values are propagated.
+In the case of the tunnel grid, Q-learning will perform identically to an agent that guesses randomly (random walk) until it eventual reaches a non-zero reward state. Until then, none of the states it visits will produce a meaningful Q-value. This is highly inefficient, as the expected number of states the agent will visit before reaching the end is $n^2 + n$ with n being the number of states between the start and terminal point. Once this state is eventually reached, the Q-values will be updated only for that state. The agent would have to return to that state again for the Q-value to propagate further. In total, the expected number of steps the agent would have to move before a full path is created in this MDP is the sum of expected values from 1 to n random walks. In a 19 state tunnel grid world, that comes out to around 3,000 expected steps before a full path of q-values are propagated.
 
 A more intelligent agent would keep track of previously visited states that resulted in all zero q-scores and place greater action probability on moving to previously unexplored states. Another enhancement would be to remember the path taken by the agent and update q-values for the entire path once a non-zero reward state is encountered, rather than only updating the closest state.
 
@@ -127,7 +127,7 @@ Figure~\ref{side-tunnel-value} shows the comparative waste with value iteration.
 
 \subsection{Simple Grid}
 
-To evaluate value and policy iteration performance empirically as the number of states increase, each algorithm was run to convergence on grids ranging from 3 by 3 (9 states) to 30 by 30 (900 states). A single, positive valued, terminal state was set at one corner. Figure~/ref{simple-planning-performance} shows the results of this experiment. Within these grid sizes, iterations seem to grow linearly with respect to the grid edge size, which seems reasonable considering the radiating propagation behavior seen with these algorithms. Elapsed time for each shows greater than linear growth, which can be partially attributed to the polynomial growth of the number of states. Relatively, policy iteration elapsed time seems to grow at a greater rate than value iteration. At 900 states, the difference is as great as 40\% slower.
+To evaluate value and policy iteration performance empirically as the number of states increase, each algorithm was run to convergence on grids ranging from 3 by 3 (9 states) to 30 by 30 (900 states). A single, positive valued, terminal state was set at one corner. Figure~\ref{simple-planning-performance} shows the results of this experiment. Within these grid sizes, iterations seem to grow linearly with respect to the grid edge size, which seems reasonable considering the radiating propagation behavior. Elapsed time for each shows greater than linear growth, which can be partially attributed to the polynomial growth of the number of states. Relatively, policy iteration elapsed time seems to grow at a greater rate than value iteration. At 900 states, the difference is as great as 40\% slower.
 
 
 \begin{figure}[!htbp]
@@ -144,13 +144,20 @@ Hamming distance over time is shown in Figure~\ref{simple-hd}. This plot shows h
     \caption{algorithm convergence over time \label{simple-hd}}
 \end{figure} 
 
-For our reinforcement learning agent, this simple grid provides an opportunity to explore the effects of various $\alpha$ (learning rate) and $\epsilon$ (exploration rate) settings.
+\paragraph{Q-Learning}
+
+For our reinforcement learning agent, this simple grid provides an opportunity to explore the effects of various $\alpha$ (learning rate) and $\epsilon$ (exploration rate) settings. First, we can look at how quickly the utility value at the agent's starting point accumulates over time. Figure~\ref{simple-q-alpha} shows the progress of five agents with various learning rates as they explore a 30x30 simple grid. A slight negative reward is set at each non-terminal state to penalize non-optimal movement. With an $\alpha$ of 1, we see that q-scores propagate quickly to the starting state as the agent puts the most weight on recently computed q-scores. However, we do notice a dip and an ongoing variance after reaching a stable value. This is due to the fact that the agent is acting in a stochastic environment, and deviations from the optimal path with have a greater affect on the computed q-scores at each (state, action) pair visited during an episode. There are two methods we could implement to improve this. First, we could start with $\alpha$ at 1 and decay this value over time. The idea being to transition the agent from exploration to exploitation. The second strategy would be to maintain a separate $\alpha$ for each (state, action) pair, and to decay the value based on the number of times that pair has been observed by the agent. This would make the exploration-exploitation transition local to well visited states.
+
 
 \begin{figure}[!htbp]
     \centering
     \includegraphics[width=3in]{images/simple/q-alpha.pdf}
     \caption{cumulative rewards over time (various $\alpha$) \label{simple-q-alpha}}
 \end{figure} 
+
+Figure~\ref{simple-q-epsilon} shows the progress of our Q-learning agent on a 30x30 simple grid, with various $\epsilon$ values. We see that with a higher exploration incentive, the agent takes more steps to converge on an optimal path. However, we also see less sacrifice in reward during exploration, as many episodes of random exploration will ignore previously learned sub-optimal paths. The advantage of epsilon-greedy exploration can be seen clearly with a slight modification to the grid. In Figure~\ref{trap-q-epsilon} we see the result of running the same agents on a grid with a trap state (lower reward) in the center of the grid. We see that agents with low $\epsilon$ get stuck at the lower reward state. More adventurous agents will continue searching for better rewards, eventually finding the higher valued terminal state.
+
+
 
 \begin{figure}[!htbp]
     \centering
@@ -164,16 +171,20 @@ For our reinforcement learning agent, this simple grid provides an opportunity t
     \caption{cumulative rewards over time - trap grid (various $\epsilon$) \label{trap-q-epsilon}}
 \end{figure} 
 
-\begin{figure}[!htbp]
-    \centering
-    \includegraphics[width=3in]{images/trap/e02.pdf}
-    \caption{trap grid - 0.2 $\epsilon$) \label{trap-e02}}
-\end{figure} 
+Figures~\ref{trap-e02}~and~\ref{trap-e08} show a smaller version if this trap grid world. Figure~\ref{trap-e02} shows an agent with a small exploration incentive after over 12,000 episodes. The resulting policy and computed state values show how the agent did not explore the farther state enough to influence the established q-scores. Instead the agent repeats the path from the starting state to the first positive state, focusing almost exclusively on exploiting it's current knowledge of the world.
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=3in]{images/trap/e08.pdf}
-    \caption{trap grid - 0.8 $\epsilon$) \label{trap-e08}}
+    \includegraphics[width=2.5in]{images/trap/e02.pdf}
+    \caption{trap grid - (0.2 $\epsilon$) \label{trap-e02}}
+\end{figure} 
+
+Figure~\ref{trap-e08} shows an agent with a higher $\epsilon$ value. This agent effective learns to bypass the low reward state in favor of the farther state. It also finds this optimal policy with less than 1,500 episodes. This exploration driven agent has one major disadvantage. All those moves spent exploring are wasted if the farther, more valuable, state doesn't exist. As with the learning rate, an agent that decreases $\epsilon$ over time would be able to gradually transition between exploring and exploiting.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=2.5in]{images/trap/e08.pdf}
+    \caption{trap grid - (0.8 $\epsilon$) \label{trap-e08}}
 \end{figure} 
 
 
@@ -183,42 +194,11 @@ Theoretically, performance of both value and policy iteration are determined by 
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=3in]{images/random.pdf}
+    \includegraphics[width=2.5in]{images/random.pdf}
     \caption{random grid \label{random}}
 \end{figure} 
 
 Q-learning on these random grids performed with mixed results, depending on the starting state of the agent. In some cases, the agent was restricted to an isolated section of the grid by walls. In these cases, exploration of the reachable area was completed quickly and an optimal policy was discovered to the nearest positive terminal state. Performance was also affected by the general shape of the grid. As we noted with the tunnel grid example, Q-learning performed well when positive terminal states were close to the starting state and larges sections of the grid could essentially be ignored. In these situations, stopping criteria would be helpful. Something similar to the update threshold in value and approximate policy iteration. In fact, a reverse of epsilon greedy search could work well. The process would involve decreasing epsilon until an established path was determined. Epsilon would then be increase to encourage the agent to focus on exploration. Given that that optimal policy is already determined, there is less need for improving the already established path and more effort can go into finding alternative paths and reward states.
-
-
-\section{Value Iteration}
-
-
-\section{Policy Iteration}
-
-\section{Q-Learning}
-
-metrics
-    elapsed time
-    hamming distance
-
-lazy vs. eager learning.
-
-planning performance
-
-policy iteration implementation issues
-    get's stuck with only policy change check
-    takes too long with epsilon check
-    works well with value update check
-
-
-q-learning performnace
-q-learning strategies
-
-
-
-
-
-
 
 
 \bibliographystyle{abbrv}

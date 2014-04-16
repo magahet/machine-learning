@@ -67,10 +67,10 @@ def value_curve(mdp, alpha=0.5, epsilon=0.3, r=0, n=0.2):
 
 def q_experiment():
     fig, axes = plt.subplots()
-    g = gridworld.getTrapGrid(10)
+    g = gridworld.getSimpleGrid(30)
     for a in range(1, 6):
         v = a * 0.2
-        x, y = value_curve(g, alpha=v, r=-0.2)
+        x, y = value_curve(g, alpha=v, r=-0.5, n=0.9)
         axes.plot(x, y, label='a={}'.format(v))
     h, l = axes.get_legend_handles_labels()
     axes.legend(h, l, loc=2)
