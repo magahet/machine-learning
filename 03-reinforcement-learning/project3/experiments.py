@@ -49,8 +49,8 @@ def value_curve(mdp, alpha=0.5, epsilon=0.3, r=0, n=0.2):
     x = []
     y = []
     total_steps = 0
-    while total_steps <= 600000:
-        if total_steps % 60000 == 0:
+    while total_steps <= 60000:
+        if total_steps % 6000 == 0:
             sys.stdout.write('.')
             sys.stdout.flush()
         #time.sleep(1)
@@ -67,11 +67,11 @@ def value_curve(mdp, alpha=0.5, epsilon=0.3, r=0, n=0.2):
 
 def q_experiment():
     fig, axes = plt.subplots()
-    g = gridworld.getSimpleGrid(30)
-    for a in range(1, 6):
+    g = gridworld.getSimpleGrid(10)
+    for a in range(1, 2):
         v = a * 0.2
-        x, y = value_curve(g, alpha=v, r=-0.5, n=0.9)
-        axes.plot(x, y, label='a={}'.format(v))
+        x, y = value_curve(g, epsilon=v, r=-0.5, n=0.9)
+        axes.plot(x, y, label='e={}'.format(v))
     h, l = axes.get_legend_handles_labels()
     axes.legend(h, l, loc=2)
     axes.set_ylabel('cumulative reward')
@@ -88,7 +88,6 @@ def plot(y):
     return fig, axes
 
 
-f, a = q_experiment()
 
 #r = range(3, 31)
 #r = [30]
